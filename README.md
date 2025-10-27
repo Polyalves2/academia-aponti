@@ -1,2 +1,2 @@
-# academia-aponti
+# academia
 **🏋️‍♂️Aplicativo para alunos e professores de uma academia🏋️‍♂️**
