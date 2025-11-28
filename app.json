@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "Forma Academia",
+    "slug": "forma-academia",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "formaacademia",
+    "userInterfaceStyle": "automatic",
+    "assetBundlePatterns": ["**/*"],
+    "android": {
+      "package": "com.formaacademia.app"
+    },
+    "ios": {
+      "bundleIdentifier": "com.formaacademia.app"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "placeholder-project-id"
+      }
+    }
+  }
+}
