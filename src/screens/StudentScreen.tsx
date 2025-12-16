@@ -1,92 +1,17 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { BrandWordmark } from '../components/BrandWordmark'
+import { trainings, Training } from '../data/trainings'
 import { UserProfile } from '../types/profile'
-
-type Training = {
-  id: string
-  titulo: string
-  foco: string
-  calorias: { min: number; max: number }
-  objetivo: string
-  tempo: { min: number; max: number }
-  frequenciaSemanal: number
-}
 
 interface StudentScreenProps {
   profile: UserProfile
   onBackHome: () => void
   onOpenProfile: () => void
+  onViewTraining: (training: Training) => void
 }
 
-const trainings: Training[] = [
-  {
-    id: 'treino_a',
-    titulo: 'Treino A',
-    foco: 'Pernas e Gluteos',
-    calorias: { min: 350, max: 450 },
-    objetivo: 'Hipertrofia',
-    tempo: { min: 60, max: 75 },
-    frequenciaSemanal: 2,
-  },
-  {
-    id: 'treino_b',
-    titulo: 'Treino B',
-    foco: 'Peito e Triceps',
-    calorias: { min: 300, max: 400 },
-    objetivo: 'Hipertrofia',
-    tempo: { min: 60, max: 70 },
-    frequenciaSemanal: 2,
-  },
-  {
-    id: 'treino_c',
-    titulo: 'Treino C',
-    foco: 'Costas e Biceps',
-    calorias: { min: 350, max: 450 },
-    objetivo: 'Hipertrofia',
-    tempo: { min: 60, max: 70 },
-    frequenciaSemanal: 2,
-  },
-  {
-    id: 'treino_d',
-    titulo: 'Treino D',
-    foco: 'Ombros e Trapezio',
-    calorias: { min: 350, max: 450 },
-    objetivo: 'Hipertrofia',
-    tempo: { min: 60, max: 80 },
-    frequenciaSemanal: 2,
-  },
-  {
-    id: 'treino_e',
-    titulo: 'Treino E',
-    foco: 'Abdomen e Core',
-    calorias: { min: 300, max: 350 },
-    objetivo: 'Definicao',
-    tempo: { min: 45, max: 60 },
-    frequenciaSemanal: 2,
-  },
-  {
-    id: 'treino_f',
-    titulo: 'Treino F',
-    foco: 'Full Body',
-    calorias: { min: 450, max: 600 },
-    objetivo: 'Condicionamento',
-    tempo: { min: 70, max: 90 },
-    frequenciaSemanal: 1,
-  },
-  {
-    id: 'treino_g',
-    titulo: 'Treino G',
-    foco: 'Cardio e Resistencia',
-    calorias: { min: 400, max: 550 },
-    objetivo: 'Emagrecimento',
-    tempo: { min: 40, max: 60 },
-    frequenciaSemanal: 2,
-  },
-]
-
-export function StudentScreen({ onBackHome, onOpenProfile, profile }: StudentScreenProps) {
-  const [detailTraining, setDetailTraining] = useState<Training | null>(null)
+export function StudentScreen({ onBackHome, onOpenProfile, onViewTraining, profile }: StudentScreenProps) {
   const recommendedTraining = trainings[0]
   const otherTrainings = useMemo(() => trainings.slice(1), [])
   const hasPhoto = Boolean(profile.photoUri)
@@ -113,31 +38,13 @@ export function StudentScreen({ onBackHome, onOpenProfile, profile }: StudentScr
         <TrainingCard
           training={recommendedTraining}
           highlight
-          onViewDetails={(training) => setDetailTraining(training)}
+          onViewDetails={onViewTraining}
         />
 
         <Text style={[styles.sectionTitle, styles.sectionSpacing]}>Outras opcoes:</Text>
         {otherTrainings.map((training) => (
-          <TrainingCard key={training.id} training={training} onViewDetails={(item) => setDetailTraining(item)} />
+          <TrainingCard key={training.id} training={training} onViewDetails={onViewTraining} />
         ))}
-
-        {detailTraining ? (
-          <View style={styles.detailCard}>
-            <Text style={styles.detailTitle}>Treino selecionado</Text>
-            <Text style={styles.detailSubtitle}>{detailTraining.titulo}</Text>
-            <Text style={styles.detailText}>Foco: {detailTraining.foco}</Text>
-            <Text style={styles.detailText}>Objetivo: {detailTraining.objetivo}</Text>
-            <Text style={styles.detailText}>
-              Tempo medio: {detailTraining.tempo.min} a {detailTraining.tempo.max} minutos
-            </Text>
-            <Text style={styles.detailText}>
-              Gasto calórico: {detailTraining.calorias.min}-{detailTraining.calorias.max} kcal
-            </Text>
-            <TouchableOpacity style={styles.detailClose} onPress={() => setDetailTraining(null)}>
-              <Text style={styles.detailCloseText}>Fechar</Text>
-            </TouchableOpacity>
-          </View>
-        ) : null}
       </ScrollView>
     </View>
   )
@@ -319,39 +226,5 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '800',
   },
-  detailCard: {
-    marginTop: 10,
-    backgroundColor: '#fff',
-    borderRadius: 18,
-    padding: 18,
-    borderWidth: 1,
-    borderColor: '#dfe2eb',
-  },
-  detailTitle: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#1b2131',
-    marginBottom: 2,
-  },
-  detailSubtitle: {
-    fontWeight: '700',
-    color: '#4a6ef4',
-    marginBottom: 10,
-  },
-  detailText: {
-    color: '#3b4354',
-    marginBottom: 4,
-  },
-  detailClose: {
-    marginTop: 12,
-    alignSelf: 'flex-end',
-    paddingVertical: 8,
-    paddingHorizontal: 18,
-    borderRadius: 16,
-    backgroundColor: '#f0f3ff',
-  },
-  detailCloseText: {
-    color: '#2c4fda',
-    fontWeight: '700',
-  },
+
 })
