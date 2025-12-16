@@ -1,140 +1,92 @@
 import { useMemo, useState } from 'react'
-import {
-  Animated,
-  Image,
-  ImageBackground,
-  ImageSourcePropType,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native'
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { BrandWordmark } from '../components/BrandWordmark'
 import alunoHomem from '../assets/aluno_homem.jpg'
-import iconAvaliar from '../assets/icon_avaliar.png'
-import iconFicha from '../assets/icon_ficha.png'
-import iconSenha from '../assets/icon_senha.png'
-import iconSair from '../assets/icon_sair.png'
-import iconSeta from '../assets/icon_seta.png'
-import maqExtensora from '../assets/maq_extensora.jpg'
-import maqBike from '../assets/maq_bike.jpg'
-import maqCrucifixo from '../assets/maq_crucifixo.jpg'
-import maqAbdutora from '../assets/maq_abdutora.png'
 
-type Exercise = {
-  name: string
-  image: ImageSourcePropType
-  equipment?: string
-  sets: { rep: number; serie: number; weight: string; date: string }[]
+type Training = {
+  id: string
+  titulo: string
+  foco: string
+  calorias: { min: number; max: number }
+  objetivo: string
+  tempo: { min: number; max: number }
+  frequenciaSemanal: number
 }
 
 interface StudentScreenProps {
   onBackHome: () => void
 }
 
-const drawerWidth = Platform.OS === 'web' ? 310 : 280
-const drawerClosedOffset = Platform.OS === 'web' ? drawerWidth + 60 : drawerWidth + 40
-
-const exercises: Exercise[] = [
+const trainings: Training[] = [
   {
-    name: 'Máquina Extensora',
-    equipment: 'Extensora',
-    image: maqExtensora,
-    sets: [
-      { rep: 3, serie: 10, weight: '35kg', date: '15/11/25' },
-      { rep: 3, serie: 10, weight: '35kg', date: '08/11/25' },
-      { rep: 3, serie: 10, weight: '35kg', date: '02/11/25' },
-    ],
+    id: 'treino_a',
+    titulo: 'Treino A',
+    foco: 'Pernas e Gluteos',
+    calorias: { min: 350, max: 450 },
+    objetivo: 'Hipertrofia',
+    tempo: { min: 60, max: 75 },
+    frequenciaSemanal: 2,
   },
   {
-    name: 'Bicicleta Ergométrica',
-    equipment: 'Bike Ergométrica',
-    image: maqBike,
-    sets: [
-      { rep: 4, serie: 12, weight: 'Corpo', date: '17/11/25' },
-      { rep: 4, serie: 12, weight: 'Corpo', date: '10/11/25' },
-      { rep: 4, serie: 12, weight: 'Corpo', date: '03/11/25' },
-    ],
+    id: 'treino_b',
+    titulo: 'Treino B',
+    foco: 'Peito e Triceps',
+    calorias: { min: 300, max: 400 },
+    objetivo: 'Hipertrofia',
+    tempo: { min: 60, max: 70 },
+    frequenciaSemanal: 2,
   },
   {
-    name: 'Crucifixo Peitoral',
-    equipment: 'Máquina Peitoral',
-    image: maqCrucifixo,
-    sets: [
-      { rep: 3, serie: 12, weight: '25kg', date: '12/11/25' },
-      { rep: 3, serie: 12, weight: '25kg', date: '05/11/25' },
-      { rep: 3, serie: 12, weight: '25kg', date: '29/10/25' },
-    ],
+    id: 'treino_c',
+    titulo: 'Treino C',
+    foco: 'Costas e Biceps',
+    calorias: { min: 350, max: 450 },
+    objetivo: 'Hipertrofia',
+    tempo: { min: 60, max: 70 },
+    frequenciaSemanal: 2,
   },
   {
-    name: 'Máquina Abdutora',
-    equipment: 'Máquina Abdutora',
-    image: maqAbdutora,
-    sets: [
-      { rep: 3, serie: 10, weight: '35kg', date: '15/11/25' },
-      { rep: 3, serie: 10, weight: '35kg', date: '08/11/25' },
-      { rep: 3, serie: 10, weight: '35kg', date: '02/11/25' },
-    ],
+    id: 'treino_d',
+    titulo: 'Treino D',
+    foco: 'Ombros e Trapezio',
+    calorias: { min: 350, max: 450 },
+    objetivo: 'Hipertrofia',
+    tempo: { min: 60, max: 80 },
+    frequenciaSemanal: 2,
+  },
+  {
+    id: 'treino_e',
+    titulo: 'Treino E',
+    foco: 'Abdomen e Core',
+    calorias: { min: 300, max: 350 },
+    objetivo: 'Definicao',
+    tempo: { min: 45, max: 60 },
+    frequenciaSemanal: 2,
+  },
+  {
+    id: 'treino_f',
+    titulo: 'Treino F',
+    foco: 'Full Body',
+    calorias: { min: 450, max: 600 },
+    objetivo: 'Condicionamento',
+    tempo: { min: 70, max: 90 },
+    frequenciaSemanal: 1,
+  },
+  {
+    id: 'treino_g',
+    titulo: 'Treino G',
+    foco: 'Cardio e Resistencia',
+    calorias: { min: 400, max: 550 },
+    objetivo: 'Emagrecimento',
+    tempo: { min: 40, max: 60 },
+    frequenciaSemanal: 2,
   },
 ]
 
-const profile = {
-  name: 'Allan Henrique',
-  matricula: '857083',
-  idade: 24,
-  peso: '79 kg',
-  avatar: alunoHomem,
-}
-
 export function StudentScreen({ onBackHome }: StudentScreenProps) {
-  const [search, setSearch] = useState('')
-  const [isProfileOpen, setIsProfileOpen] = useState(false)
-  const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null)
-  const [completedExercises, setCompletedExercises] = useState<Record<string, boolean>>({})
-  const profilePanelAnim = useMemo(() => new Animated.Value(1), [])
-
-  const filteredExercises = useMemo(() => {
-    const query = search.toLowerCase()
-    return exercises.filter((exercise) => exercise.name.toLowerCase().includes(query))
-  }, [search])
-
-  const toggleCompleted = (exerciseName: string) => {
-    setCompletedExercises((prev) => ({
-      ...prev,
-      [exerciseName]: !prev[exerciseName],
-    }))
-  }
-
-  const openProfilePanel = () => {
-    setIsProfileOpen(true)
-    Animated.timing(profilePanelAnim, {
-      toValue: 0,
-      duration: 180,
-      useNativeDriver: true,
-    }).start()
-  }
-
-  const closeProfilePanel = () => {
-    Animated.timing(profilePanelAnim, {
-      toValue: 1,
-      duration: 160,
-      useNativeDriver: true,
-    }).start(() => setIsProfileOpen(false))
-  }
-
-  const drawerTranslate = useMemo(
-    () =>
-      profilePanelAnim.interpolate({
-        inputRange: [0, 1],
-        outputRange: [0, drawerClosedOffset],
-      }),
-    [profilePanelAnim],
-  )
-
-  const selectedExerciseCompleted = selectedExercise ? completedExercises[selectedExercise.name] : false
+  const [detailTraining, setDetailTraining] = useState<Training | null>(null)
+  const recommendedTraining = trainings[0]
+  const otherTrainings = useMemo(() => trainings.slice(1), [])
 
   return (
     <View style={styles.screen}>
@@ -142,150 +94,93 @@ export function StudentScreen({ onBackHome }: StudentScreenProps) {
         <TouchableOpacity onPress={onBackHome}>
           <BrandWordmark size="lg" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.avatarButton} onPress={openProfilePanel}>
-          <Image source={profile.avatar} style={styles.avatar} resizeMode="cover" />
-        </TouchableOpacity>
+        <View style={styles.avatarWrapper}>
+          <Image source={alunoHomem} style={styles.avatar} />
+        </View>
       </View>
 
-      <View style={styles.body}>
-        <View style={styles.searchCard}>
-          <View style={styles.searchInputWrapper}>
-            <View style={styles.searchIcon}>
-              <View style={styles.searchCircle} />
-              <View style={styles.searchHandle} />
-            </View>
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Pesquisar"
-              placeholderTextColor="#bfc5d3"
-              value={search}
-              onChangeText={setSearch}
-            />
-          </View>
-          <TouchableOpacity style={styles.filterButton}>
-            <View style={styles.filterLineLong} />
-            <View style={styles.filterLineMid} />
-            <View style={styles.filterLineShort} />
-          </TouchableOpacity>
-        </View>
+      <ScrollView contentContainerStyle={styles.scroll}>
+        <Text style={styles.sectionTitle}>Treino indicado:</Text>
+        <TrainingCard
+          training={recommendedTraining}
+          highlight
+          onViewDetails={(training) => setDetailTraining(training)}
+        />
 
-        <View style={styles.dayHeader}>
-          <View style={styles.dayLine} />
-          <Text style={styles.dayTitle}>Segunda-feira</Text>
-          <View style={styles.dayLine} />
-        </View>
+        <Text style={[styles.sectionTitle, styles.sectionSpacing]}>Outras opcoes:</Text>
+        {otherTrainings.map((training) => (
+          <TrainingCard key={training.id} training={training} onViewDetails={(item) => setDetailTraining(item)} />
+        ))}
 
-        <ScrollView contentContainerStyle={styles.grid}>
-          {filteredExercises.map((exercise) => (
-            <TouchableOpacity key={exercise.name} style={styles.card} onPress={() => setSelectedExercise(exercise)}>
-              <View style={styles.cardImage}>
-                <Image source={exercise.image} style={styles.cardImageInner} resizeMode="contain" />
-              </View>
-              <View style={styles.cardFooter}>
-                <Text style={styles.cardTitle}>{exercise.name}</Text>
-              </View>
+        {detailTraining ? (
+          <View style={styles.detailCard}>
+            <Text style={styles.detailTitle}>Treino selecionado</Text>
+            <Text style={styles.detailSubtitle}>{detailTraining.titulo}</Text>
+            <Text style={styles.detailText}>Foco: {detailTraining.foco}</Text>
+            <Text style={styles.detailText}>Objetivo: {detailTraining.objetivo}</Text>
+            <Text style={styles.detailText}>
+              Tempo medio: {detailTraining.tempo.min} a {detailTraining.tempo.max} minutos
+            </Text>
+            <Text style={styles.detailText}>
+              Gasto calórico: {detailTraining.calorias.min}-{detailTraining.calorias.max} kcal
+            </Text>
+            <TouchableOpacity style={styles.detailClose} onPress={() => setDetailTraining(null)}>
+              <Text style={styles.detailCloseText}>Fechar</Text>
             </TouchableOpacity>
-          ))}
-        </ScrollView>
+          </View>
+        ) : null}
+      </ScrollView>
+    </View>
+  )
+}
+
+interface TrainingCardProps {
+  training: Training
+  highlight?: boolean
+  onViewDetails: (training: Training) => void
+}
+
+function TrainingCard({ training, highlight, onViewDetails }: TrainingCardProps) {
+  return (
+    <View style={[styles.card, highlight && styles.cardHighlight]}>
+      <View style={styles.cardHeader}>
+        <View style={styles.cardIcon} />
+        <View style={styles.cardHeaderCopy}>
+          <Text style={styles.cardTitle}>{training.titulo}</Text>
+          <Text style={styles.cardFocus}>{training.foco}</Text>
+        </View>
       </View>
 
-      {isProfileOpen && (
-        <View style={styles.drawerOverlay}>
-          <TouchableOpacity style={styles.drawerScrim} onPress={closeProfilePanel} />
-          <Animated.View style={[styles.drawerCard, { transform: [{ translateX: drawerTranslate }] }]}>
-            <Image source={profile.avatar} style={styles.drawerAvatar} resizeMode="cover" />
-            <View style={styles.drawerInfoGroup}>
-              <View style={styles.drawerInfoChip}>
-                <Text style={styles.drawerInfoText}>Nome: {profile.name}</Text>
-              </View>
-              <View style={styles.drawerInfoChip}>
-                <Text style={styles.drawerInfoText}>Matrícula: {profile.matricula}</Text>
-              </View>
-              <View style={styles.drawerInfoChip}>
-                <Text style={styles.drawerInfoText}>Idade: {profile.idade} anos</Text>
-              </View>
-              <View style={styles.drawerInfoChip}>
-                <Text style={styles.drawerInfoText}>Peso: {profile.peso}</Text>
-              </View>
-            </View>
+      <View style={styles.cardInfo}>
+        <InfoLine label="Gasto calorico" value={`${training.calorias.min}-${training.calorias.max} kcal`} />
+        <InfoLine label="Objetivo" value={training.objetivo} />
+        <InfoLine label="Tempo medio" value={`${training.tempo.min} a ${training.tempo.max} minutos`} />
+        <InfoLine
+          label="Frequencia"
+          value={`${training.frequenciaSemanal === 1 ? '1 vez' : `1 a ${training.frequenciaSemanal}x`} por semana`}
+        />
+      </View>
 
-            <View style={styles.drawerActionGroup}>
-              {[
-                { label: 'Avaliar professor', icon: iconAvaliar },
-                { label: 'Baixar avaliação', icon: iconFicha },
-                { label: 'Alterar senha', icon: iconSenha },
-                { label: 'Sair', icon: iconSair },
-              ].map((action) => (
-                <TouchableOpacity key={action.label} style={styles.drawerAction}>
-                  <Image source={action.icon} style={styles.drawerActionIcon} />
-                  <Text style={styles.drawerActionText}>{action.label}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </Animated.View>
-        </View>
-      )}
+      <TouchableOpacity style={styles.cardButton} onPress={() => onViewDetails(training)}>
+        <Text style={styles.cardButtonText}>Visualizar treino completo</Text>
+      </TouchableOpacity>
+    </View>
+  )
+}
 
-      {selectedExercise && (
-        <View style={styles.detailScreen}>
-          <View style={styles.detailHeader}>
-            <TouchableOpacity style={styles.detailNavButton} onPress={() => setSelectedExercise(null)}>
-              <Image source={iconSeta} style={styles.detailNavIcon} />
-            </TouchableOpacity>
-            <Text style={styles.detailHeaderTitle}>Exercício</Text>
-            <Image source={profile.avatar} style={styles.detailHeaderAvatar} />
-          </View>
+interface InfoLineProps {
+  label: string
+  value: string
+}
 
-          <ScrollView style={styles.detailScroll} contentContainerStyle={styles.detailContent}>
-            <ImageBackground
-              source={selectedExercise.image}
-              style={styles.detailImage}
-              imageStyle={styles.detailImageInner}
-            />
-
-            <TouchableOpacity
-              style={[styles.detailActionButton, selectedExerciseCompleted && styles.detailActionButtonDone]}
-              onPress={() => toggleCompleted(selectedExercise.name)}
-            >
-              <Text
-                style={[
-                  styles.detailActionButtonText,
-                  selectedExerciseCompleted && styles.detailActionButtonDoneText,
-                ]}
-              >
-                {selectedExerciseCompleted ? 'Concluído' : 'Marcar como concluído'}
-              </Text>
-            </TouchableOpacity>
-
-            <View style={styles.detailCard}>
-              <View style={styles.detailCardHeader}>
-                <Text style={styles.detailCardTitle}>{selectedExercise.name}</Text>
-              </View>
-
-              {selectedExercise.sets.map((set, index) => (
-                <View key={`${selectedExercise.name}-${index}`} style={styles.detailSetRow}>
-                  <View style={styles.detailSetCell}>
-                    <Text style={styles.detailSetLabel}>Rep</Text>
-                    <Text style={styles.detailSetValue}>{set.rep}</Text>
-                  </View>
-                  <View style={styles.detailSetCell}>
-                    <Text style={styles.detailSetLabel}>Série</Text>
-                    <Text style={styles.detailSetValue}>{set.serie}</Text>
-                  </View>
-                  <View style={styles.detailSetCell}>
-                    <Text style={styles.detailSetLabel}>Peso</Text>
-                    <Text style={styles.detailSetValue}>{set.weight}</Text>
-                  </View>
-                  <View style={styles.detailSetCell}>
-                    <Text style={styles.detailSetLabel}>Data</Text>
-                    <Text style={styles.detailSetValue}>{set.date}</Text>
-                  </View>
-                </View>
-              ))}
-            </View>
-          </ScrollView>
-        </View>
-      )}
+function InfoLine({ label, value }: InfoLineProps) {
+  return (
+    <View style={styles.infoLine}>
+      <View style={styles.infoBullet} />
+      <View style={styles.infoTextWrapper}>
+        <Text style={styles.infoLabel}>{label}:</Text>
+        <Text style={styles.infoValue}>{value}</Text>
+      </View>
     </View>
   )
 }
@@ -293,16 +188,18 @@ export function StudentScreen({ onBackHome }: StudentScreenProps) {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#083061',
-    paddingTop: 24,
+    backgroundColor: '#e7ebf4',
   },
   header: {
-    paddingHorizontal: 20,
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 20,
+    paddingHorizontal: 18,
+    paddingBottom: 12,
+    backgroundColor: '#083060',
   },
-  avatarButton: {
+  avatarWrapper: {
     width: 46,
     height: 46,
     borderRadius: 23,
@@ -315,347 +212,128 @@ const styles = StyleSheet.create({
     height: '100%',
     resizeMode: 'cover',
   },
-  body: {
-    flex: 1,
-    marginTop: 16,
-    backgroundColor: '#fdfdfd',
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    paddingTop: 30,
-    paddingHorizontal: 18,
-    shadowColor: '#000',
-    shadowOpacity: 0.15,
-    shadowRadius: 24,
-    shadowOffset: { width: 0, height: -2 },
-  },
-  searchCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#f4f6fb',
-    borderRadius: 24,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-  },
-  searchInputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-  },
-  searchIcon: {
-    width: 32,
-    height: 32,
-    marginRight: 10,
-    position: 'relative',
-  },
-  searchCircle: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    borderWidth: 3,
-    borderColor: '#1e1e1e',
-    position: 'absolute',
-    top: 4,
-    left: 2,
-  },
-  searchHandle: {
-    width: 12,
-    height: 3,
-    backgroundColor: '#1e1e1e',
-    position: 'absolute',
-    transform: [{ rotate: '45deg' }],
-    bottom: 7,
-    right: 4,
-    borderRadius: 2,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 18,
-    color: '#212227',
-  },
-  filterButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#ffffff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.12,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-  },
-  filterLineLong: {
-    width: 22,
-    height: 3,
-    borderRadius: 2,
-    backgroundColor: '#1d1d1f',
-  },
-  filterLineMid: {
-    width: 16,
-    height: 3,
-    borderRadius: 2,
-    backgroundColor: '#1d1d1f',
-    marginVertical: 3,
-  },
-  filterLineShort: {
-    width: 10,
-    height: 3,
-    borderRadius: 2,
-    backgroundColor: '#1d1d1f',
-  },
-  dayHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 24,
-    marginBottom: 12,
-  },
-  dayLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: '#cfd3df',
-  },
-  dayTitle: {
-    marginHorizontal: 12,
-    color: '#0f0f0f',
-    fontWeight: '800',
-    fontSize: 24,
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+  scroll: {
+    padding: 20,
     paddingBottom: 40,
   },
-  card: {
-    width: '48%',
-    backgroundColor: '#ffffff',
-    borderRadius: 26,
-    marginBottom: 18,
-    shadowColor: '#000',
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 8 },
-    overflow: 'hidden',
-  },
-  cardImage: {
-    height: 140,
-    backgroundColor: '#f0f2f7',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 10,
-  },
-  cardImageInner: {
-    width: '100%',
-    height: '100%',
-  },
-  cardFooter: {
-    backgroundColor: '#1c47c1',
-    paddingVertical: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  cardTitle: {
-    color: '#ffffff',
-    fontWeight: '700',
-    textAlign: 'center',
-  },
-  drawerOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-  },
-  drawerScrim: {
-    flex: 1,
-    backgroundColor: 'transparent',
-  },
-  drawerCard: {
-    width: drawerWidth,
-    backgroundColor: '#0c3c78',
-    borderTopLeftRadius: 28,
-    borderBottomLeftRadius: 28,
-    padding: 18,
-    marginRight: Platform.OS === 'web' ? -20 : -40,
-    shadowColor: '#000',
-    shadowOpacity: 0.35,
-    shadowRadius: 18,
-    shadowOffset: { width: -4, height: 0 },
-  },
-  drawerLogo: {
-    width: 150,
-    height: 36,
-    alignSelf: 'flex-start',
-    marginBottom: 12,
-  },
-  drawerAvatar: {
-    width: '100%',
-    height: 200,
-    borderRadius: 20,
-    marginBottom: 14,
-  },
-  drawerInfoGroup: {
-    marginBottom: 10,
-  },
-  drawerInfoChip: {
-    backgroundColor: '#2b4ad3',
-    borderRadius: 18,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    marginBottom: 8,
-  },
-  drawerInfoText: {
-    color: '#ffffff',
-    fontWeight: '700',
-  },
-  drawerActionGroup: {
-    marginTop: 16,
-  },
-  drawerAction: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#2b4ad3',
-    borderRadius: 16,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    marginBottom: 10,
-  },
-  drawerActionIcon: {
-    width: 20,
-    height: 20,
-    marginRight: 10,
-  },
-  drawerActionText: {
-    color: '#ffffff',
-    fontWeight: '700',
-  },
-  detailScreen: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#041b3d',
-  },
-  detailHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingTop: Platform.OS === 'ios' ? 50 : 32,
-    paddingBottom: 12,
-    paddingHorizontal: 20,
-    backgroundColor: '#083061',
-  },
-  detailNavButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#062549',
-  },
-  detailNavIcon: {
-    width: 20,
-    height: 20,
-    tintColor: '#ffffff',
-    transform: [{ rotate: '180deg' }],
-    resizeMode: 'contain',
-  },
-  detailHeaderTitle: {
-    color: '#ffffff',
+  sectionTitle: {
     fontSize: 20,
     fontWeight: '800',
+    color: '#222a38',
+    marginBottom: 14,
   },
-  detailHeaderAvatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    borderWidth: 2,
-    borderColor: '#ffffff',
+  sectionSpacing: {
+    marginTop: 12,
   },
-  detailScroll: {
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 18,
+    marginBottom: 18,
+    shadowColor: '#000',
+    shadowOpacity: 0.09,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 10 },
+    borderWidth: 1,
+    borderColor: '#dfe2eb',
+  },
+  cardHighlight: {
+    borderColor: '#4a6ef4',
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  cardIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#ffe398',
+    marginRight: 12,
+  },
+  cardHeaderCopy: {
     flex: 1,
   },
-  detailContent: {
-    paddingTop: 16,
-    paddingHorizontal: 20,
-    paddingBottom: 60,
-    backgroundColor: '#041b3d',
+  cardTitle: {
+    fontWeight: '800',
+    fontSize: 18,
+    color: '#1b1f2c',
   },
-  detailImage: {
-    width: '100%',
-    height: 260,
-    marginTop: 20,
-    borderRadius: 22,
-    backgroundColor: '#ffffff',
+  cardFocus: {
+    color: '#4b5463',
+    fontWeight: '600',
+    marginTop: 2,
   },
-  detailImageInner: {
-    borderRadius: 22,
-    resizeMode: 'contain',
-    backgroundColor: '#ffffff',
+  cardInfo: {
+    marginBottom: 12,
+    gap: 8,
   },
-  detailActionButton: {
-    marginTop: 18,
-    borderRadius: 20,
-    backgroundColor: '#1b4fd1',
+  infoLine: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  infoBullet: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#4a6ef4',
+    marginTop: 6,
+    marginRight: 10,
+  },
+  infoTextWrapper: {
+    flex: 1,
+  },
+  infoLabel: {
+    fontWeight: '800',
+    color: '#1f2736',
+  },
+  infoValue: {
+    color: '#404b60',
+  },
+  cardButton: {
+    backgroundColor: '#4a6ef4',
+    borderRadius: 18,
     paddingVertical: 12,
     alignItems: 'center',
   },
-  detailActionButtonDone: {
-    backgroundColor: '#0b2f7d',
-    borderWidth: 2,
-    borderColor: '#7ee1ff',
-  },
-  detailActionButtonText: {
-    color: '#ffffff',
+  cardButtonText: {
+    color: '#fff',
     fontWeight: '800',
-    fontSize: 16,
-  },
-  detailActionButtonDoneText: {
-    color: '#7ee1ff',
   },
   detailCard: {
-    marginTop: 18,
-    borderRadius: 24,
-    backgroundColor: '#0a2c80',
-    overflow: 'hidden',
+    marginTop: 10,
+    backgroundColor: '#fff',
+    borderRadius: 18,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: '#dfe2eb',
   },
-  detailCardHeader: {
-    backgroundColor: '#113fba',
-    paddingVertical: 14,
-    alignItems: 'center',
-  },
-  detailCardTitle: {
-    color: '#ffffff',
-    fontWeight: '800',
+  detailTitle: {
     fontSize: 18,
-  },
-  detailSetRow: {
-    flexDirection: 'row',
-    padding: 12,
-  },
-  detailSetCell: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    paddingVertical: 10,
-    marginHorizontal: 4,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  detailSetLabel: {
-    color: '#0a2c80',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  detailSetValue: {
-    color: '#1a1a1a',
-    fontSize: 16,
     fontWeight: '800',
-    marginTop: 2,
+    color: '#1b2131',
+    marginBottom: 2,
+  },
+  detailSubtitle: {
+    fontWeight: '700',
+    color: '#4a6ef4',
+    marginBottom: 10,
+  },
+  detailText: {
+    color: '#3b4354',
+    marginBottom: 4,
+  },
+  detailClose: {
+    marginTop: 12,
+    alignSelf: 'flex-end',
+    paddingVertical: 8,
+    paddingHorizontal: 18,
+    borderRadius: 16,
+    backgroundColor: '#f0f3ff',
+  },
+  detailCloseText: {
+    color: '#2c4fda',
+    fontWeight: '700',
   },
 })
