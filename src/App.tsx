@@ -5,9 +5,11 @@ import { LoginScreen } from './screens/LoginScreen'
 import { StudentScreen } from './screens/StudentScreen'
 import { ProfileScreen } from './screens/ProfileScreen'
 import { ProfileDataScreen } from './screens/ProfileDataScreen'
+import { ExerciseDetailScreen } from './screens/ExerciseDetailScreen'
 import { UserProfile } from './types/profile'
+import { Training } from './data/trainings'
 
-type AppScreen = 'landing' | 'login' | 'student' | 'profile' | 'profileData'
+type AppScreen = 'landing' | 'login' | 'student' | 'profile' | 'profileData' | 'trainingDetail'
 
 function App() {
   const [activeScreen, setActiveScreen] = useState<AppScreen>('landing')
@@ -22,6 +24,7 @@ function App() {
     address: 'Av. Brasil, 1200 - Centro, São Paulo',
     photoUri: undefined,
   })
+  const [selectedTraining, setSelectedTraining] = useState<Training | null>(null)
 
   const updateProfile = (changes: Partial<UserProfile>) => {
     setProfile((prev) => ({ ...prev, ...changes }))
@@ -44,6 +47,10 @@ function App() {
             profile={profile}
             onBackHome={() => setActiveScreen('landing')}
             onOpenProfile={() => setActiveScreen('profile')}
+            onViewTraining={(training) => {
+              setSelectedTraining(training)
+              setActiveScreen('trainingDetail')
+            }}
           />
         )
       case 'profile':
@@ -63,6 +70,25 @@ function App() {
             onSave={(data) => {
               updateProfile(data)
               setActiveScreen('profile')
+            }}
+          />
+        )
+      case 'trainingDetail':
+        return selectedTraining ? (
+          <ExerciseDetailScreen
+            training={selectedTraining}
+            profile={profile}
+            onBack={() => setActiveScreen('student')}
+            onOpenProfile={() => setActiveScreen('profile')}
+          />
+        ) : (
+          <StudentScreen
+            profile={profile}
+            onBackHome={() => setActiveScreen('landing')}
+            onOpenProfile={() => setActiveScreen('profile')}
+            onViewTraining={(training) => {
+              setSelectedTraining(training)
+              setActiveScreen('trainingDetail')
             }}
           />
         )
