@@ -1,5 +1,14 @@
-import { useState } from 'react'
-import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { useEffect, useState } from 'react'
+import {
+  Image,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native'
 import { BrandWordmark } from '../components/BrandWordmark'
 import googleIconSource from '../assets/icon_google.png'
 
@@ -17,8 +26,29 @@ const roleCredentials: Record<Role, { label: string; idValue: string; password: 
 }
 
 const roles: Role[] = ['Aluno', 'Professor', 'Administrador']
+const tailwindGradientClass =
+  'min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-black overflow-y-auto'
+
+function useTailwindCdn() {
+  useEffect(() => {
+    if (Platform.OS !== 'web' || typeof document === 'undefined') {
+      return
+    }
+
+    if (document.getElementById('tailwind-cdn-script')) {
+      return
+    }
+
+    const script = document.createElement('script')
+    script.id = 'tailwind-cdn-script'
+    script.src = 'https://cdn.tailwindcss.com'
+    script.async = true
+    document.head.appendChild(script)
+  }, [])
+}
 
 export function LoginScreen({ onBackHome, onLoginSuccess }: LoginScreenProps) {
+  useTailwindCdn()
   const [selectedRole, setSelectedRole] = useState<Role>('Aluno')
   const [isPickerOpen, setIsPickerOpen] = useState(false)
   const [feedback, setFeedback] = useState('')
@@ -38,7 +68,7 @@ export function LoginScreen({ onBackHome, onLoginSuccess }: LoginScreenProps) {
 
   const credentials = roleCredentials[selectedRole]
 
-  return (
+  const content = (
     <View style={styles.screen}>
       <ScrollView contentContainerStyle={styles.container} bounces={false}>
         <TouchableOpacity onPress={onBackHome} activeOpacity={0.8}>
@@ -49,9 +79,9 @@ export function LoginScreen({ onBackHome, onLoginSuccess }: LoginScreenProps) {
           <Text style={styles.heading}>Faca seu login</Text>
           <Text style={styles.description}>Dados pre-preenchidos apenas para demonstracao.</Text>
 
-        <View style={[styles.formGroup, styles.dropdownGroup]}>
-          <Text style={styles.label}>Perfil</Text>
-          <View style={styles.dropdownWrapper}>
+          <View style={[styles.formGroup, styles.dropdownGroup]}>
+            <Text style={styles.label}>Perfil</Text>
+            <View style={styles.dropdownWrapper}>
               <TouchableOpacity style={styles.dropdownField} onPress={togglePicker} activeOpacity={0.7}>
                 <Text style={styles.dropdownValue}>{selectedRole}</Text>
                 <Text style={styles.dropdownIcon}>{isPickerOpen ? '^' : 'v'}</Text>
@@ -120,15 +150,20 @@ export function LoginScreen({ onBackHome, onLoginSuccess }: LoginScreenProps) {
           </Text>
         </View>
       </ScrollView>
-
     </View>
   )
+
+  if (Platform.OS === 'web') {
+    return <div className={tailwindGradientClass}>{content}</div>
+  }
+
+  return content
 }
 
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#04142d',
+    backgroundColor: Platform.select({ web: 'transparent', default: '#020617' }),
   },
   container: {
     flexGrow: 1,
