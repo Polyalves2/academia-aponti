@@ -3,11 +3,29 @@ import { SafeAreaView, StatusBar, StyleSheet, View } from 'react-native'
 import { LandingScreen } from './screens/LandingScreen'
 import { LoginScreen } from './screens/LoginScreen'
 import { StudentScreen } from './screens/StudentScreen'
+import { ProfileScreen } from './screens/ProfileScreen'
+import { ProfileDataScreen } from './screens/ProfileDataScreen'
+import { UserProfile } from './types/profile'
 
-type AppScreen = 'landing' | 'login' | 'student'
+type AppScreen = 'landing' | 'login' | 'student' | 'profile' | 'profileData'
 
 function App() {
   const [activeScreen, setActiveScreen] = useState<AppScreen>('landing')
+  const [profile, setProfile] = useState<UserProfile>({
+    name: 'Allan Henrique Barbosa da Silva',
+    age: 24,
+    weight: '79 kg',
+    matricula: '857083',
+    professor: 'Ellen Fernanda da Silva Lima',
+    email: 'allan.henrique@email.com',
+    phone: '(11) 99999-0000',
+    address: 'Av. Brasil, 1200 - Centro, São Paulo',
+    photoUri: undefined,
+  })
+
+  const updateProfile = (changes: Partial<UserProfile>) => {
+    setProfile((prev) => ({ ...prev, ...changes }))
+  }
 
   const screen = useMemo(() => {
     switch (activeScreen) {
@@ -21,11 +39,37 @@ function App() {
           />
         )
       case 'student':
-        return <StudentScreen onBackHome={() => setActiveScreen('landing')} />
+        return (
+          <StudentScreen
+            profile={profile}
+            onBackHome={() => setActiveScreen('landing')}
+            onOpenProfile={() => setActiveScreen('profile')}
+          />
+        )
+      case 'profile':
+        return (
+          <ProfileScreen
+            profile={profile}
+            onBack={() => setActiveScreen('student')}
+            onUpdateProfile={updateProfile}
+            onNavigateToData={() => setActiveScreen('profileData')}
+          />
+        )
+      case 'profileData':
+        return (
+          <ProfileDataScreen
+            profile={profile}
+            onBack={() => setActiveScreen('profile')}
+            onSave={(data) => {
+              updateProfile(data)
+              setActiveScreen('profile')
+            }}
+          />
+        )
       default:
         return null
     }
-  }, [activeScreen])
+  }, [activeScreen, profile])
 
   return (
     <SafeAreaView style={styles.root}>

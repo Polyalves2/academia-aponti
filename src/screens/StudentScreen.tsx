@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { BrandWordmark } from '../components/BrandWordmark'
-import alunoHomem from '../assets/aluno_homem.jpg'
+import { UserProfile } from '../types/profile'
 
 type Training = {
   id: string
@@ -14,7 +14,9 @@ type Training = {
 }
 
 interface StudentScreenProps {
+  profile: UserProfile
   onBackHome: () => void
+  onOpenProfile: () => void
 }
 
 const trainings: Training[] = [
@@ -83,10 +85,11 @@ const trainings: Training[] = [
   },
 ]
 
-export function StudentScreen({ onBackHome }: StudentScreenProps) {
+export function StudentScreen({ onBackHome, onOpenProfile, profile }: StudentScreenProps) {
   const [detailTraining, setDetailTraining] = useState<Training | null>(null)
   const recommendedTraining = trainings[0]
   const otherTrainings = useMemo(() => trainings.slice(1), [])
+  const hasPhoto = Boolean(profile.photoUri)
 
   return (
     <View style={styles.screen}>
@@ -94,9 +97,15 @@ export function StudentScreen({ onBackHome }: StudentScreenProps) {
         <TouchableOpacity onPress={onBackHome}>
           <BrandWordmark size="lg" />
         </TouchableOpacity>
-        <View style={styles.avatarWrapper}>
-          <Image source={alunoHomem} style={styles.avatar} />
-        </View>
+        <TouchableOpacity style={styles.avatarWrapper} onPress={onOpenProfile}>
+          {hasPhoto ? (
+            <Image source={{ uri: profile.photoUri }} style={styles.avatar} />
+          ) : (
+            <View style={styles.avatarPlaceholder}>
+              <Text style={styles.avatarInitials}>{profile.name.slice(0, 1)}</Text>
+            </View>
+          )}
+        </TouchableOpacity>
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll}>
@@ -155,10 +164,7 @@ function TrainingCard({ training, highlight, onViewDetails }: TrainingCardProps)
         <InfoLine label="Gasto calorico" value={`${training.calorias.min}-${training.calorias.max} kcal`} />
         <InfoLine label="Objetivo" value={training.objetivo} />
         <InfoLine label="Tempo medio" value={`${training.tempo.min} a ${training.tempo.max} minutos`} />
-        <InfoLine
-          label="Frequencia"
-          value={`${training.frequenciaSemanal === 1 ? '1 vez' : `1 a ${training.frequenciaSemanal}x`} por semana`}
-        />
+        <InfoLine label="Frequencia" value={`${training.frequenciaSemanal}x por semana`} />
       </View>
 
       <TouchableOpacity style={styles.cardButton} onPress={() => onViewDetails(training)}>
@@ -211,6 +217,18 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     resizeMode: 'cover',
+  },
+  avatarPlaceholder: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#ffffff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarInitials: {
+    color: '#083060',
+    fontWeight: '800',
+    fontSize: 16,
   },
   scroll: {
     padding: 20,
