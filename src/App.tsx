@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import { SafeAreaView, StatusBar, StyleSheet, View } from 'react-native'
+import { useEffect, useMemo, useState } from 'react'
+import { Platform, SafeAreaView, StatusBar, StyleSheet, View } from 'react-native'
 import { LandingScreen } from './screens/LandingScreen'
 import { LoginScreen } from './screens/LoginScreen'
 import { StudentScreen } from './screens/StudentScreen'
@@ -9,9 +9,31 @@ import { ExerciseDetailScreen } from './screens/ExerciseDetailScreen'
 import { UserProfile } from './types/profile'
 import { Training } from './data/trainings'
 
+declare module 'react-native' {
+  interface ViewProps {
+    className?: string
+  }
+}
+
 type AppScreen = 'landing' | 'login' | 'student' | 'profile' | 'profileData' | 'trainingDetail'
 
 function App() {
+  useEffect(() => {
+    if (Platform.OS !== 'web' || typeof document === 'undefined') {
+      return
+    }
+
+    if (document.getElementById('tailwind-cdn-script')) {
+      return
+    }
+
+    const script = document.createElement('script')
+    script.id = 'tailwind-cdn-script'
+    script.src = 'https://cdn.tailwindcss.com'
+    script.async = true
+    document.head.appendChild(script)
+  }, [])
+
   const [activeScreen, setActiveScreen] = useState<AppScreen>('landing')
   const [profile, setProfile] = useState<UserProfile>({
     name: 'Allan Henrique Barbosa da Silva',
@@ -95,10 +117,15 @@ function App() {
       default:
         return null
     }
-  }, [activeScreen, profile])
+  }, [activeScreen, profile, selectedTraining])
 
   return (
-    <SafeAreaView style={styles.root}>
+    <SafeAreaView
+      style={styles.root}
+      className={
+        Platform.OS === 'web' ? 'bg-gradient-to-br from-slate-900 via-indigo-950 to-black' : undefined
+      }
+    >
       <StatusBar barStyle="light-content" backgroundColor="#041228" />
       <View style={styles.screen}>{screen}</View>
     </SafeAreaView>

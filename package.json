@@ -11,15 +11,15 @@
     "lint": "eslint App.tsx src --ext .ts,.tsx"
   },
   "dependencies": {
+    "@expo/metro-runtime": "~3.2.3",
     "@react-native-community/cli-server-api": "^12.3.6",
-    "expo": "~51.0.28",
-    "expo-status-bar": "~1.12.1",
+    "expo": "^54.0.29",
     "expo-image-picker": "^15",
+    "expo-status-bar": "~1.12.1",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-native": "0.76.1",
-    "react-native-web": "~0.19.10",
-    "@expo/metro-runtime": "~3.2.3"
+    "react-native-web": "~0.19.10"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
