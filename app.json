@@ -2,6 +2,16 @@
   "expo": {
     "name": "Forma Academia",
     "slug": "forma-academia",
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "kotlinVersion": "2.0.21"
+          }
+        }
+      ]
+    ],
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "formaacademia",
