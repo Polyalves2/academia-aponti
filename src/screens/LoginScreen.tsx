@@ -76,8 +76,7 @@ export function LoginScreen({ onBackHome, onLoginSuccess }: LoginScreenProps) {
         </TouchableOpacity>
 
         <View style={styles.card}>
-          <Text style={styles.heading}>Faca seu login</Text>
-          <Text style={styles.description}>Dados pre-preenchidos apenas para demonstracao.</Text>
+          <Text style={styles.heading}>Faça seu login</Text>
 
           <View style={[styles.formGroup, styles.dropdownGroup]}>
             <Text style={styles.label}>Perfil</Text>
