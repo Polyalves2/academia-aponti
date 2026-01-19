@@ -11,7 +11,7 @@ interface ProfileScreenProps {
   onNavigateToData: () => void
 }
 
-export function ProfileScreen({ profile, onBack, onUpdateProfile, onNavigateToData }: ProfileScreenProps) {
+export function ProfileScreen({ profile, onBack, onUpdateProfile }: ProfileScreenProps) {
   const pickImage = useCallback(
     async (source: 'camera' | 'library') => {
       try {
@@ -67,11 +67,8 @@ export function ProfileScreen({ profile, onBack, onUpdateProfile, onNavigateToDa
 
   const actionButtons = [
     { label: 'Financeiro', onPress: () => Alert.alert('Financeiro', 'Funcionalidade em breve.') },
-    { label: 'Dados Cadastrados', onPress: onNavigateToData },
-    { label: 'Avaliar professor', onPress: () => Alert.alert('Avaliar professor', 'Funcionalidade em breve.') },
+    { label: 'Check-in', onPress: () => Alert.alert('Check-in', 'Funcionalidade em breve.') },
     { label: 'Baixar avaliacao', onPress: () => Alert.alert('Baixar avaliacao', 'Funcionalidade em breve.') },
-    { label: 'Alterar senha', onPress: () => Alert.alert('Alterar senha', 'Funcionalidade em breve.') },
-    { label: 'Sair', onPress: () => Alert.alert('Sair', 'Funcionalidade em breve.') },
   ]
 
   return (

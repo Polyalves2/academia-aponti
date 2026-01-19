@@ -47,7 +47,6 @@ export function StudentScreen({ onBackHome, onOpenProfile, onViewTraining, profi
           onViewDetails={onViewTraining}
         />
 
-        <Text style={[styles.sectionTitle, styles.sectionSpacing]}>Outras opcoes:</Text>
         {otherTrainings.map((training) => (
           <TrainingCard key={training.id} training={training} onViewDetails={onViewTraining} />
         ))}
