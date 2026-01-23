@@ -92,13 +92,7 @@ export function ProfessorStudentTrainingListScreen({
         <View style={styles.headerSpacer} />
       </View>
 
-      <TouchableOpacity style={styles.addButton} onPress={handleOpenAdd}>
-        <Text style={styles.addButtonText}>+</Text>
-      </TouchableOpacity>
 
-      <TouchableOpacity style={styles.closeButton} onPress={onBack}>
-        <Text style={styles.closeText}>x</Text>
-      </TouchableOpacity>
 
       <ScrollView contentContainerStyle={styles.content} bounces keyboardShouldPersistTaps="handled">
         <Text style={styles.sectionTitle}>Treino indicado:</Text>
@@ -230,25 +224,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
   },
-  addButton: {
-    position: 'absolute',
-    top: 18,
-    right: 18,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#083272',
-    borderWidth: 1,
-    borderColor: '#1a4a9a',
-    zIndex: 12,
-  },
-  addButtonText: {
-    color: '#ffffff',
-    fontWeight: '800',
-    fontSize: 18,
-  },
   backButton: {
     width: 40,
     height: 40,
@@ -264,23 +239,6 @@ const styles = StyleSheet.create({
     height: 18,
     tintColor: '#000000',
     transform: [{ rotate: '180deg' }],
-  },
-  closeButton: {
-    position: 'absolute',
-    top: 64,
-    alignSelf: 'center',
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: '#2b2b2b',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 10,
-  },
-  closeText: {
-    color: '#ffffff',
-    fontWeight: '800',
-    fontSize: 16,
   },
   content: {
     backgroundColor: '#e6e6ee',

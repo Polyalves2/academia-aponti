@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import { Alert, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import backIcon from '../assets/icon_seta.png'
+import { trainings } from '../data/trainings'
 
 interface ProfessorTrainingChangesScreenProps {
   onBack: () => void
@@ -7,6 +9,11 @@ interface ProfessorTrainingChangesScreenProps {
 }
 
 export function ProfessorTrainingChangesScreen({ onBack, onSubmit }: ProfessorTrainingChangesScreenProps) {
+  const [selectedTrainingId, setSelectedTrainingId] = useState(trainings[0]?.id ?? '')
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+
+  const selectedTraining = trainings.find((item) => item.id === selectedTrainingId)
+
   return (
     <View style={styles.screen}>
       <View style={styles.header}>
@@ -19,7 +26,46 @@ export function ProfessorTrainingChangesScreen({ onBack, onSubmit }: ProfessorTr
 
       <ScrollView contentContainerStyle={styles.content} bounces keyboardShouldPersistTaps="handled">
         <View style={styles.card}>
-          <Field label="Treino" value="Treino A - Pernas e Gluteos" />
+          <Text style={styles.label}>Treino</Text>
+          <View style={styles.dropdownWrapper}>
+            <TouchableOpacity
+              style={styles.dropdownField}
+              activeOpacity={0.8}
+              onPress={() => setIsDropdownOpen((prev) => !prev)}
+            >
+              <Text style={styles.dropdownValue}>
+                {selectedTraining ? `${selectedTraining.titulo} - ${selectedTraining.foco}` : 'Selecione o treino'}
+              </Text>
+              <Text style={styles.dropdownIcon}>{isDropdownOpen ? '^' : 'v'}</Text>
+            </TouchableOpacity>
+            {isDropdownOpen ? (
+              <View style={styles.dropdownList}>
+                <ScrollView
+                  style={styles.dropdownScroll}
+                  contentContainerStyle={styles.dropdownScrollContent}
+                  showsVerticalScrollIndicator
+                >
+                  {trainings.map((training) => {
+                    const active = training.id === selectedTrainingId
+                    return (
+                      <TouchableOpacity
+                        key={training.id}
+                        style={[styles.dropdownOption, active && styles.dropdownOptionActive]}
+                        onPress={() => {
+                          setSelectedTrainingId(training.id)
+                          setIsDropdownOpen(false)
+                        }}
+                      >
+                        <Text style={[styles.dropdownOptionText, active && styles.dropdownOptionTextActive]}>
+                          {training.titulo} - {training.foco}
+                        </Text>
+                      </TouchableOpacity>
+                    )
+                  })}
+                </ScrollView>
+              </View>
+            ) : null}
+          </View>
 
           <Field label="Exercicio" value="Agachamento livre" />
 
@@ -44,9 +90,17 @@ export function ProfessorTrainingChangesScreen({ onBack, onSubmit }: ProfessorTr
             />
           </View>
 
-          <TouchableOpacity style={styles.primaryButton} onPress={onSubmit}>
-            <Text style={styles.primaryButtonText}>Salvar alteração</Text>
-          </TouchableOpacity>
+          <View style={styles.actionRow}>
+            <TouchableOpacity
+              style={styles.primaryButton}
+              onPress={() => Alert.alert('Upload', 'Envio de PDF em breve.')}
+            >
+              <Text style={styles.primaryButtonText}>Enviar PDF</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.primaryButton} onPress={onSubmit}>
+              <Text style={styles.primaryButtonText}>Salvar alteração</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </View>
@@ -126,6 +180,59 @@ const styles = StyleSheet.create({
     shadowRadius: 14,
     shadowOffset: { width: 0, height: 10 },
   },
+  dropdownWrapper: {
+    marginBottom: 12,
+  },
+  dropdownField: {
+    backgroundColor: '#eef1f7',
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: '#d2d8e6',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  dropdownValue: {
+    color: '#1f2a44',
+    fontWeight: '700',
+  },
+  dropdownIcon: {
+    color: '#1f2a44',
+    fontWeight: '800',
+  },
+  dropdownList: {
+    marginTop: 6,
+    backgroundColor: '#ffffff',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#d2d8e6',
+    paddingVertical: 6,
+    maxHeight: 220,
+  },
+  dropdownScroll: {
+    maxHeight: 210,
+  },
+  dropdownScrollContent: {
+    paddingVertical: 4,
+  },
+  dropdownOption: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eef1f7',
+  },
+  dropdownOptionActive: {
+    backgroundColor: '#e3e6f3',
+  },
+  dropdownOptionText: {
+    color: '#1f2a44',
+    fontWeight: '700',
+  },
+  dropdownOptionTextActive: {
+    color: '#0f1b3d',
+  },
   row: {
     flexDirection: 'row',
     gap: 12,
@@ -165,7 +272,12 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
     minHeight: 90,
   },
+  actionRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
   primaryButton: {
+    flex: 1,
     backgroundColor: '#4f66b6',
     borderRadius: 14,
     paddingVertical: 12,

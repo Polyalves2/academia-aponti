@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Alert, Image, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Alert, Image, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import backIcon from '../assets/icon_seta.png'
 import { StudentRegistration } from '../types/admin'
 
@@ -29,6 +29,7 @@ export function AdminStudentRegisterScreen({ onBack, onSubmit }: AdminStudentReg
     'Pendente' | 'Pago' | 'Atrasado' | 'Cancelado' | 'Cortesia' | ''
   >('Pendente')
   const [statusPlano, setStatusPlano] = useState<'Ativo' | 'Inativo' | ''>('Ativo')
+  const [openPicker, setOpenPicker] = useState<'plano' | 'tipoLancamento' | 'statusPlano' | null>(null)
 
   const handleSubmit = () => {
     const registration: StudentRegistration = {
@@ -127,12 +128,21 @@ export function AdminStudentRegisterScreen({ onBack, onSubmit }: AdminStudentReg
             value={instituicao}
             onChangeText={setInstituicao}
           />
-          <PlanPicker selected={plano} onSelect={setPlano} />
+          <PlanPicker
+            selected={plano}
+            open={openPicker === 'plano'}
+            onToggle={() => setOpenPicker((prev) => (prev === 'plano' ? null : 'plano'))}
+            onClose={() => setOpenPicker(null)}
+            onSelect={setPlano}
+          />
 
           <FinanceDropdown
             label="Tipo de Lancamento"
             value={tipoLancamento}
             options={['Pendente', 'Pago', 'Atrasado', 'Cancelado', 'Cortesia']}
+            open={openPicker === 'tipoLancamento'}
+            onToggle={() => setOpenPicker((prev) => (prev === 'tipoLancamento' ? null : 'tipoLancamento'))}
+            onClose={() => setOpenPicker(null)}
             onSelect={setTipoLancamento}
           />
 
@@ -164,6 +174,9 @@ export function AdminStudentRegisterScreen({ onBack, onSubmit }: AdminStudentReg
               label="Status do plano"
               value={statusPlano}
               options={['Ativo', 'Inativo']}
+              open={openPicker === 'statusPlano'}
+              onToggle={() => setOpenPicker((prev) => (prev === 'statusPlano' ? null : 'statusPlano'))}
+              onClose={() => setOpenPicker(null)}
               onSelect={setStatusPlano}
               compact
             />
@@ -237,41 +250,51 @@ function GenderOption({ label, active, onPress }: GenderOptionProps) {
 
 interface PlanPickerProps {
   selected: 'Verao' | 'Inverno' | ''
+  open: boolean
+  onToggle: () => void
+  onClose: () => void
   onSelect: (value: 'Verao' | 'Inverno') => void
 }
 
-function PlanPicker({ selected, onSelect }: PlanPickerProps) {
-  const [open, setOpen] = useState(false)
+function PlanPicker({ selected, open, onToggle, onClose, onSelect }: PlanPickerProps) {
   const label = selected || 'Plano'
 
   return (
     <View style={styles.field}>
       <Text style={styles.label}>Tipo de plano contrato</Text>
       <View style={styles.planWrapper}>
-        <TouchableOpacity
-          style={styles.planField}
-          activeOpacity={0.8}
-          onPress={() => setOpen((prev) => !prev)}
+        <Pressable
+          style={({ hovered, pressed }) => [
+            styles.planField,
+            hovered && styles.planFieldHover,
+            pressed && styles.planFieldPressed,
+          ]}
+          onPress={onToggle}
         >
           <Text style={styles.planValue}>{label}</Text>
           <Text style={styles.planIcon}>{open ? '^' : 'v'}</Text>
-        </TouchableOpacity>
+        </Pressable>
 
         {open ? (
           <View style={styles.planList}>
             {(['Verao', 'Inverno'] as const).map((plan) => {
               const active = plan === selected
               return (
-                <TouchableOpacity
+                <Pressable
                   key={plan}
-                  style={[styles.planOption, active && styles.planOptionActive]}
+                  style={({ hovered, pressed }) => [
+                    styles.planOption,
+                    active && styles.planOptionActive,
+                    hovered && styles.planOptionHover,
+                    pressed && styles.planOptionPressed,
+                  ]}
                   onPress={() => {
                     onSelect(plan)
-                    setOpen(false)
+                    onClose()
                   }}
                 >
                   <Text style={[styles.planOptionText, active && styles.planOptionTextActive]}>{plan}</Text>
-                </TouchableOpacity>
+                </Pressable>
               )
             })}
           </View>
@@ -284,6 +307,9 @@ function PlanPicker({ selected, onSelect }: PlanPickerProps) {
 interface FinanceDropdownProps<T extends string> {
   label: string
   value: T
+  open: boolean
+  onToggle: () => void
+  onClose: () => void
   options: readonly T[]
   onSelect: (value: T) => void
   compact?: boolean
@@ -292,42 +318,51 @@ interface FinanceDropdownProps<T extends string> {
 function FinanceDropdown<T extends string>({
   label,
   value,
+  open,
+  onToggle,
+  onClose,
   options,
   onSelect,
   compact,
 }: FinanceDropdownProps<T>) {
-  const [open, setOpen] = useState(false)
-
   return (
     <View style={[styles.field, compact && styles.fieldFlex]}>
       <Text style={styles.label}>{label}</Text>
       <View style={styles.planWrapper}>
-        <TouchableOpacity
-          style={styles.planField}
-          activeOpacity={0.8}
-          onPress={() => setOpen((prev) => !prev)}
+        <Pressable
+          style={({ hovered, pressed }) => [
+            styles.planField,
+            hovered && styles.planFieldHover,
+            pressed && styles.planFieldPressed,
+          ]}
+          onPress={onToggle}
         >
           <Text style={styles.planValue}>{value}</Text>
           <Text style={styles.planIcon}>{open ? '^' : 'v'}</Text>
-        </TouchableOpacity>
+        </Pressable>
 
         {open ? (
           <View style={styles.planList}>
             {options.map((option) => {
               const active = option === value
               return (
-                <TouchableOpacity
+                <Pressable
                   key={option}
-                  style={[styles.planOption, active && styles.planOptionActive]}
+                  style={({ hovered, pressed }) => [
+                    styles.planOption,
+                    active && styles.planOptionActive,
+                    hovered && styles.planOptionHover,
+                    pressed && styles.planOptionPressed,
+                  ]}
                   onPress={() => {
                     onSelect(option)
-                    setOpen(false)
+                    onClose()
                   }}
                 >
                   <Text style={[styles.planOptionText, active && styles.planOptionTextActive]}>
                     {option}
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
               )
             })}
           </View>
@@ -483,6 +518,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#d2d8e6',
   },
+  planFieldHover: {
+    borderColor: '#9db1f2',
+  },
+  planFieldPressed: {
+    borderColor: '#7e95de',
+  },
   planValue: {
     color: '#1e3160',
     fontWeight: '700',
@@ -509,6 +550,14 @@ const styles = StyleSheet.create({
   planOption: {
     paddingVertical: 8,
     paddingHorizontal: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eef1f7',
+  },
+  planOptionHover: {
+    backgroundColor: '#edf2ff',
+  },
+  planOptionPressed: {
+    backgroundColor: '#dde6ff',
   },
   planOptionActive: {
     backgroundColor: '#e3e6f3',

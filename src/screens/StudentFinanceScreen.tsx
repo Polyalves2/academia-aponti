@@ -135,7 +135,6 @@ export function StudentFinanceScreen({ onBack }: StudentFinanceScreenProps) {
                         {bill.month}
                       </Text>
                     </View>
-                    <Text style={styles.monthArrow}>{'>'}</Text>
                   </Pressable>
                 ))}
               </ScrollView>
@@ -410,10 +409,6 @@ const styles = StyleSheet.create({
   },
   monthTextSelected: {
     color: '#3f49b8',
-  },
-  monthArrow: {
-    color: '#a3a9bf',
-    fontWeight: '800',
   },
   primaryButton: {
     alignSelf: 'flex-start',

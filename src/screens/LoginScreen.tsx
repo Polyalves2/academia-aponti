@@ -252,6 +252,7 @@ const styles = StyleSheet.create({
     elevation: 12,
     zIndex: 40,
     maxHeight: 220,
+    overflow: 'hidden',
   },
   dropdownScroll: {
     maxHeight: 200,
@@ -259,6 +260,8 @@ const styles = StyleSheet.create({
   dropdownOption: {
     paddingVertical: 12,
     paddingHorizontal: 18,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eef1f7',
   },
   dropdownOptionActive: {
     backgroundColor: '#cce3ff',

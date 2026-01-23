@@ -1,4 +1,4 @@
-import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import backIcon from '../assets/icon_seta.png'
 import studentPhoto from '../assets/aluno_homem.jpg'
 import { StudentRegistration } from '../types/admin'
@@ -72,12 +72,6 @@ export function ProfessorStudentTrainingScreen({
           </View>
 
           <View style={styles.actionRow}>
-            <TouchableOpacity
-              style={styles.primaryButton}
-              onPress={() => Alert.alert('Upload', 'Envio em breve.')}
-            >
-              <Text style={styles.primaryButtonText}>Fazer Upload</Text>
-            </TouchableOpacity>
             <TouchableOpacity
               style={styles.primaryButton}
               onPress={onOpenTrainings}
