@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { SafeAreaView, StatusBar, StyleSheet, View } from 'react-native'
+import { Alert, SafeAreaView, StatusBar, StyleSheet, View } from 'react-native'
 import { LandingScreen } from './screens/LandingScreen'
 import { LoginScreen } from './screens/LoginScreen'
 import { AdminScreen } from './screens/AdminScreen'
@@ -15,6 +15,11 @@ import { StudentScreen } from './screens/StudentScreen'
 import { ProfileScreen } from './screens/ProfileScreen'
 import { ExerciseDetailScreen } from './screens/ExerciseDetailScreen'
 import { StudentFinanceScreen } from './screens/StudentFinanceScreen'
+import { ProfessorScreen } from './screens/ProfessorScreen'
+import { ProfessorStudentTrainingScreen } from './screens/ProfessorStudentTrainingScreen'
+import { ProfessorStudentTrainingListScreen } from './screens/ProfessorStudentTrainingListScreen'
+import { ProfessorTrainingChangesScreen } from './screens/ProfessorTrainingChangesScreen'
+import { ProfessorPointScreen } from './screens/ProfessorPointScreen'
 import { UserProfile } from './types/profile'
 import { trainings, Training } from './data/trainings'
 import { StudentRegistration } from './types/admin'
@@ -33,6 +38,13 @@ type AppScreen =
   | 'adminProfessorProfile'
   | 'profile'
   | 'studentFinance'
+  | 'professor'
+  | 'professorProfile'
+  | 'professorStudents'
+  | 'professorStudentTraining'
+  | 'professorStudentTrainingList'
+  | 'professorTrainingChanges'
+  | 'professorPoint'
   | 'profileData'
   | 'trainingDetail'
   | 'recoverPassword'
@@ -51,6 +63,8 @@ function App() {
     photoUri: undefined,
   })
   const [selectedTraining, setSelectedTraining] = useState<Training | null>(null)
+  const [isProfessorTrainingView, setIsProfessorTrainingView] = useState(false)
+  const [trainingRecommendations, setTrainingRecommendations] = useState<Record<string, string[]>>({})
   const [completedTrainingIds, setCompletedTrainingIds] = useState<Record<string, boolean>>({})
   const [recoverEmail, setRecoverEmail] = useState('aluno@forma.com')
   const [studentRegistrations, setStudentRegistrations] = useState<StudentRegistration[]>([])
@@ -69,6 +83,21 @@ function App() {
     })
   }
 
+  const handleAddRecommendation = (trainingId: string, text: string) => {
+    setTrainingRecommendations((prev) => {
+      const next = prev[trainingId] ? [...prev[trainingId], text] : [text]
+      return { ...prev, [trainingId]: next }
+    })
+  }
+
+  const handleRemoveRecommendation = (trainingId: string, index: number) => {
+    setTrainingRecommendations((prev) => {
+      const list = prev[trainingId] || []
+      const next = list.filter((_, idx) => idx !== index)
+      return { ...prev, [trainingId]: next }
+    })
+  }
+
   const screen = useMemo(() => {
     switch (activeScreen) {
       case 'landing':
@@ -78,7 +107,9 @@ function App() {
           <LoginScreen
             onBackHome={() => setActiveScreen('landing')}
             onLoginSuccess={(role) =>
-              setActiveScreen(role === 'Administrador' ? 'admin' : 'student')
+              setActiveScreen(
+                role === 'Administrador' ? 'admin' : role === 'Professor' ? 'professor' : 'student',
+              )
             }
             onForgotPassword={(email) => {
               setRecoverEmail(email)
@@ -164,6 +195,7 @@ function App() {
             onOpenProfile={() => setActiveScreen('profile')}
             onViewTraining={(training) => {
               setSelectedTraining(training)
+              setIsProfessorTrainingView(false)
               setActiveScreen('trainingDetail')
             }}
           />
@@ -178,6 +210,68 @@ function App() {
             onOpenFinance={() => setActiveScreen('studentFinance')}
           />
         )
+      case 'professor':
+        return (
+          <ProfessorScreen
+            onBackHome={() => setActiveScreen('landing')}
+            onOpenProfile={() => setActiveScreen('professorProfile')}
+            onRegisterPoint={() => setActiveScreen('professorPoint')}
+            onOpenStudents={() => setActiveScreen('professorStudents')}
+          />
+        )
+      case 'professorPoint':
+        return <ProfessorPointScreen onBack={() => setActiveScreen('professor')} />
+      case 'professorProfile':
+        return <AdminProfessorProfileScreen onBack={() => setActiveScreen('professor')} />
+      case 'professorStudents':
+        return (
+          <AdminStudentListScreen
+            registrations={studentRegistrations}
+            onBack={() => setActiveScreen('professor')}
+            onSelect={(registration) => {
+              setSelectedStudent(registration)
+              setActiveScreen('professorStudentTraining')
+            }}
+            title=""
+          />
+        )
+      case 'professorStudentTraining':
+        return selectedStudent ? (
+          <ProfessorStudentTrainingScreen
+            registration={selectedStudent}
+            onBack={() => setActiveScreen('professorStudents')}
+            onOpenTrainings={() => setActiveScreen('professorStudentTrainingList')}
+          />
+        ) : (
+          <AdminStudentListScreen
+            registrations={studentRegistrations}
+            onBack={() => setActiveScreen('professor')}
+            onSelect={(registration) => {
+              setSelectedStudent(registration)
+              setActiveScreen('professorStudentTraining')
+            }}
+            title=""
+          />
+        )
+      case 'professorStudentTrainingList':
+        return (
+          <ProfessorStudentTrainingListScreen
+            onBack={() => setActiveScreen('professorStudentTraining')}
+            onViewTraining={(training) => {
+              setSelectedTraining(training)
+              setIsProfessorTrainingView(true)
+              setActiveScreen('trainingDetail')
+            }}
+            onOpenChanges={() => setActiveScreen('professorTrainingChanges')}
+          />
+        )
+      case 'professorTrainingChanges':
+        return (
+          <ProfessorTrainingChangesScreen
+            onBack={() => setActiveScreen('professorStudentTrainingList')}
+            onSubmit={() => Alert.alert('Alteracao salva', 'Alteracao registrada com sucesso.')}
+          />
+        )
       case 'studentFinance':
         return <StudentFinanceScreen onBack={() => setActiveScreen('profile')} />
       case 'trainingDetail':
@@ -185,10 +279,17 @@ function App() {
           <ExerciseDetailScreen
             training={selectedTraining}
             profile={profile}
-            onBack={() => setActiveScreen('student')}
+            onBack={() =>
+              setActiveScreen(isProfessorTrainingView ? 'professorStudentTrainingList' : 'student')
+            }
             onOpenProfile={() => setActiveScreen('profile')}
             onCheckIn={handleTrainingCheckIn}
             isCompleted={Boolean(completedTrainingIds[selectedTraining.id])}
+            showCheckIn={!isProfessorTrainingView}
+            showProfessorTools={isProfessorTrainingView}
+            recommendations={trainingRecommendations[selectedTraining.id] || []}
+            onAddRecommendation={handleAddRecommendation}
+            onRemoveRecommendation={handleRemoveRecommendation}
           />
         ) : (
           <StudentScreen
@@ -198,6 +299,7 @@ function App() {
             onOpenProfile={() => setActiveScreen('profile')}
             onViewTraining={(training) => {
               setSelectedTraining(training)
+              setIsProfessorTrainingView(false)
               setActiveScreen('trainingDetail')
             }}
           />
@@ -221,6 +323,8 @@ function App() {
     studentRegistrations,
     selectedStudent,
     completedTrainingIds,
+    isProfessorTrainingView,
+    trainingRecommendations,
   ])
 
   return (

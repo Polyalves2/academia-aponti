@@ -34,7 +34,7 @@ export function AdminProfessorListScreen({ onBack, onSelect }: AdminProfessorLis
         <TouchableOpacity onPress={onBack} style={styles.backButton}>
           <Image source={backIcon} style={styles.backIcon} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Admin</Text>
+        <Text style={styles.headerTitle} />
         <Image source={studentPhoto} style={styles.headerAvatar} />
       </View>
 

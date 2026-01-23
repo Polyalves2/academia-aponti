@@ -273,7 +273,7 @@ export function AdminStudentFrequencyScreen({
         <TouchableOpacity onPress={onBack} style={styles.backButton}>
           <Image source={backIcon} style={styles.backIcon} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Admin</Text>
+        <Text style={styles.headerTitle} />
         <View style={styles.headerSpacer} />
       </View>
 

@@ -9,6 +9,7 @@ interface AdminStudentListScreenProps {
   registrations: StudentRegistration[]
   onBack: () => void
   onSelect: (registration: StudentRegistration) => void
+  title?: string
 }
 
 const mockStudents: StudentRegistration[] = [
@@ -238,6 +239,7 @@ export function AdminStudentListScreen({
   registrations,
   onBack,
   onSelect,
+  title = '',
 }: AdminStudentListScreenProps) {
   const [query, setQuery] = useState('')
   const normalize = (value: string) =>
@@ -275,7 +277,7 @@ export function AdminStudentListScreen({
         <TouchableOpacity onPress={onBack} style={styles.backButton}>
           <Image source={backIcon} style={styles.backIcon} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Admin</Text>
+        {title ? <Text style={styles.headerTitle}>{title}</Text> : <View style={styles.headerSpacer} />}
         <View style={styles.headerSpacer} />
       </View>
 

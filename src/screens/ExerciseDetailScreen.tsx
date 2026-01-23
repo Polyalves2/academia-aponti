@@ -1,4 +1,5 @@
-import { Alert, Image, ImageSourcePropType, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, Image, ImageSourcePropType, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { useEffect, useState } from 'react'
 import { Training } from '../data/trainings'
 import { UserProfile } from '../types/profile'
 import backIcon from '../assets/icon_seta.png'
@@ -10,6 +11,11 @@ interface ExerciseDetailScreenProps {
   onOpenProfile?: () => void
   onCheckIn?: (trainingId: string) => void
   isCompleted?: boolean
+  showCheckIn?: boolean
+  showProfessorTools?: boolean
+  recommendations?: string[]
+  onAddRecommendation?: (trainingId: string, text: string) => void
+  onRemoveRecommendation?: (trainingId: string, index: number) => void
 }
 
 const trainingImageAssets: Record<string, ImageSourcePropType | undefined> = {
@@ -30,9 +36,27 @@ export function ExerciseDetailScreen({
   onOpenProfile,
   onCheckIn,
   isCompleted,
+  showCheckIn = true,
+  showProfessorTools = false,
+  recommendations = [],
+  onAddRecommendation,
+  onRemoveRecommendation,
 }: ExerciseDetailScreenProps) {
   const imageSource = trainingImageAssets[training.id] ?? getTrainingImage(training.imageKeywords)
   const hasPhoto = Boolean(profile.photoUri)
+  const [exerciseList, setExerciseList] = useState(training.exercicios)
+  const [isAddExerciseOpen, setIsAddExerciseOpen] = useState(false)
+  const [exerciseName, setExerciseName] = useState('')
+  const [exerciseSeries, setExerciseSeries] = useState('')
+  const [exerciseReps, setExerciseReps] = useState('')
+  const [exercisePeso, setExercisePeso] = useState('')
+  const [exerciseIntervalo, setExerciseIntervalo] = useState('')
+  const [isRecommendationOpen, setIsRecommendationOpen] = useState(false)
+  const [recommendationText, setRecommendationText] = useState('')
+
+  useEffect(() => {
+    setExerciseList(training.exercicios)
+  }, [training])
   const handleCheckIn = () => {
     if (isCompleted) {
       return
@@ -86,11 +110,21 @@ export function ExerciseDetailScreen({
           </View>
         </View>
 
-        {training.exercicios.map((exercise, index) => (
+        {exerciseList.map((exercise, index) => (
           <View key={exercise.id} style={styles.exerciseCard}>
             <View style={styles.exerciseHeader}>
               <Text style={styles.exerciseIndex}>{index + 1}.</Text>
               <Text style={styles.exerciseName}>{exercise.nome}</Text>
+              {showProfessorTools ? (
+                <TouchableOpacity
+                  style={styles.exerciseDelete}
+                  onPress={() =>
+                    setExerciseList((prev) => prev.filter((item) => item.id !== exercise.id))
+                  }
+                >
+                  <Text style={styles.exerciseDeleteText}>x</Text>
+                </TouchableOpacity>
+              ) : null}
             </View>
             <View style={styles.exerciseInfo}>
               <InfoRow label="Series" value={`${exercise.series}`} />
@@ -102,14 +136,164 @@ export function ExerciseDetailScreen({
           </View>
         ))}
 
-        <TouchableOpacity
-          style={[styles.checkInButton, isCompleted && styles.checkInButtonDisabled]}
-          onPress={handleCheckIn}
-          disabled={Boolean(isCompleted)}
-        >
-          <Text style={styles.checkInButtonText}>Check-in</Text>
-        </TouchableOpacity>
+        {showProfessorTools || recommendations.length ? (
+          <>
+            {showProfessorTools ? (
+              <TouchableOpacity style={styles.addExerciseButton} onPress={() => setIsAddExerciseOpen(true)}>
+                <Text style={styles.addExerciseText}>Adicionar exercicio</Text>
+              </TouchableOpacity>
+            ) : null}
+            <View style={styles.recommendationsCard}>
+              <View style={styles.recommendationsHeader}>
+                <Text style={styles.recommendationsTitle}>Recomendacoes</Text>
+                {showProfessorTools ? (
+                  <TouchableOpacity style={styles.recommendationsAdd} onPress={() => setIsRecommendationOpen(true)}>
+                    <Text style={styles.recommendationsAddText}>+</Text>
+                  </TouchableOpacity>
+                ) : null}
+              </View>
+              {recommendations.length ? (
+                recommendations.map((item, idx) => (
+                  <View key={`${item}-${idx}`} style={styles.recommendationItem}>
+                    <Text style={styles.recommendationText}>{item}</Text>
+                    {showProfessorTools ? (
+                      <TouchableOpacity
+                        style={styles.recommendationDelete}
+                        onPress={() => onRemoveRecommendation?.(training.id, idx)}
+                      >
+                        <Text style={styles.recommendationDeleteText}>x</Text>
+                      </TouchableOpacity>
+                    ) : null}
+                  </View>
+                ))
+              ) : (
+                <Text style={styles.recommendationEmpty}>Sem recomendacoes</Text>
+              )}
+            </View>
+          </>
+        ) : null}
+
+        {showCheckIn ? (
+          <TouchableOpacity
+            style={[styles.checkInButton, isCompleted && styles.checkInButtonDisabled]}
+            onPress={handleCheckIn}
+            disabled={Boolean(isCompleted)}
+          >
+            <Text style={styles.checkInButtonText}>Check-in</Text>
+          </TouchableOpacity>
+        ) : null}
       </ScrollView>
+
+      <Modal transparent visible={isAddExerciseOpen} animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalCard}>
+            <Text style={styles.modalTitle}>Adicionar exercicio</Text>
+            <TextInput
+              style={styles.modalInput}
+              placeholder="Nome do exercicio"
+              placeholderTextColor="#9aa2b1"
+              value={exerciseName}
+              onChangeText={setExerciseName}
+            />
+            <View style={styles.modalRow}>
+              <TextInput
+                style={[styles.modalInput, styles.modalInputFlex]}
+                placeholder="Series"
+                placeholderTextColor="#9aa2b1"
+                value={exerciseSeries}
+                onChangeText={setExerciseSeries}
+                keyboardType="numeric"
+              />
+              <TextInput
+                style={[styles.modalInput, styles.modalInputFlex]}
+                placeholder="Repeticoes"
+                placeholderTextColor="#9aa2b1"
+                value={exerciseReps}
+                onChangeText={setExerciseReps}
+              />
+            </View>
+            <View style={styles.modalRow}>
+              <TextInput
+                style={[styles.modalInput, styles.modalInputFlex]}
+                placeholder="Peso"
+                placeholderTextColor="#9aa2b1"
+                value={exercisePeso}
+                onChangeText={setExercisePeso}
+              />
+              <TextInput
+                style={[styles.modalInput, styles.modalInputFlex]}
+                placeholder="Intervalo"
+                placeholderTextColor="#9aa2b1"
+                value={exerciseIntervalo}
+                onChangeText={setExerciseIntervalo}
+              />
+            </View>
+            <View style={styles.modalActions}>
+              <TouchableOpacity style={styles.modalButton} onPress={() => setIsAddExerciseOpen(false)}>
+                <Text style={styles.modalButtonText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.modalButtonPrimary}
+                onPress={() => {
+                  const id = `${Date.now()}`
+                  setExerciseList((prev) => [
+                    ...prev,
+                    {
+                      id,
+                      nome: exerciseName || 'Exercicio',
+                      series: Number(exerciseSeries) || 3,
+                      repeticoes: exerciseReps || '10-12',
+                      peso: exercisePeso || 'Moderado',
+                      intervalo: exerciseIntervalo || '60s',
+                    },
+                  ])
+                  setExerciseName('')
+                  setExerciseSeries('')
+                  setExerciseReps('')
+                  setExercisePeso('')
+                  setExerciseIntervalo('')
+                  setIsAddExerciseOpen(false)
+                }}
+              >
+                <Text style={styles.modalButtonPrimaryText}>Adicionar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal transparent visible={isRecommendationOpen} animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalCard}>
+            <Text style={styles.modalTitle}>Recomendacoes</Text>
+            <TextInput
+              style={[styles.modalInput, styles.modalTextarea]}
+              placeholder="Escreva a recomendacao"
+              placeholderTextColor="#9aa2b1"
+              value={recommendationText}
+              onChangeText={setRecommendationText}
+              multiline
+            />
+            <View style={styles.modalActions}>
+              <TouchableOpacity style={styles.modalButton} onPress={() => setIsRecommendationOpen(false)}>
+                <Text style={styles.modalButtonText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.modalButtonPrimary}
+                onPress={() => {
+                  if (recommendationText.trim()) {
+                    onAddRecommendation?.(training.id, recommendationText.trim())
+                    setRecommendationText('')
+                  }
+                  setIsRecommendationOpen(false)
+                }}
+              >
+                <Text style={styles.modalButtonPrimaryText}>Salvar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   )
 }
@@ -289,6 +473,95 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '800',
   },
+  exerciseDelete: {
+    marginLeft: 'auto',
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: '#ff4d4d',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  exerciseDeleteText: {
+    color: '#ffffff',
+    fontWeight: '800',
+    fontSize: 12,
+  },
+  addExerciseButton: {
+    backgroundColor: '#4f66b6',
+    borderRadius: 14,
+    paddingVertical: 10,
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  addExerciseText: {
+    color: '#ffffff',
+    fontWeight: '800',
+  },
+  recommendationsCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#dfe2eb',
+    marginTop: 10,
+  },
+  recommendationsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  recommendationsTitle: {
+    fontWeight: '800',
+    color: '#1f2736',
+  },
+  recommendationsAdd: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: '#4f66b6',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  recommendationsAddText: {
+    color: '#ffffff',
+    fontWeight: '800',
+    fontSize: 14,
+  },
+  recommendationItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#f3f4f8',
+    borderRadius: 10,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    marginBottom: 6,
+  },
+  recommendationText: {
+    color: '#1f2a44',
+    fontWeight: '600',
+    flex: 1,
+    paddingRight: 8,
+  },
+  recommendationDelete: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#ff4d4d',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  recommendationDeleteText: {
+    color: '#ffffff',
+    fontWeight: '800',
+    fontSize: 11,
+  },
+  recommendationEmpty: {
+    color: '#8a93a8',
+    fontWeight: '600',
+  },
   checkInButton: {
     backgroundColor: '#1f4fc6',
     paddingVertical: 14,
@@ -307,5 +580,75 @@ const styles = StyleSheet.create({
   },
   checkInButtonDisabled: {
     opacity: 0.55,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(10, 16, 32, 0.45)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+  },
+  modalCard: {
+    width: '100%',
+    maxWidth: 360,
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 16,
+    overflow: 'hidden',
+  },
+  modalTitle: {
+    fontWeight: '800',
+    fontSize: 16,
+    color: '#1f2a44',
+    marginBottom: 12,
+  },
+  modalInput: {
+    backgroundColor: '#eef1f7',
+    borderRadius: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: '#d2d8e6',
+    color: '#1b1b1b',
+    marginBottom: 10,
+  },
+  modalTextarea: {
+    minHeight: 90,
+    textAlignVertical: 'top',
+  },
+  modalRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  modalInputFlex: {
+    flex: 1,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 10,
+    marginTop: 6,
+  },
+  modalButton: {
+    flex: 1,
+    backgroundColor: '#e3e6f3',
+    borderRadius: 10,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  modalButtonText: {
+    color: '#1f2a44',
+    fontWeight: '800',
+  },
+  modalButtonPrimary: {
+    flex: 1,
+    backgroundColor: '#4f66b6',
+    borderRadius: 10,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  modalButtonPrimaryText: {
+    color: '#ffffff',
+    fontWeight: '800',
   },
 })
