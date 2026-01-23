@@ -15,8 +15,9 @@ import { StudentScreen } from './screens/StudentScreen'
 import { ProfileScreen } from './screens/ProfileScreen'
 // import { ProfileDataScreen } from './screens/ProfileDataScreen'
 import { ExerciseDetailScreen } from './screens/ExerciseDetailScreen'
+import { StudentFinanceScreen } from './screens/StudentFinanceScreen'
 import { UserProfile } from './types/profile'
-import { Training } from './data/trainings'
+import { trainings, Training } from './data/trainings'
 import { StudentRegistration } from './types/admin'
 
 type AppScreen =
@@ -32,6 +33,7 @@ type AppScreen =
   | 'adminProfessorList'
   | 'adminProfessorProfile'
   | 'profile'
+  | 'studentFinance'
   | 'profileData'
   | 'trainingDetail'
   | 'recoverPassword'
@@ -50,12 +52,22 @@ function App() {
     photoUri: undefined,
   })
   const [selectedTraining, setSelectedTraining] = useState<Training | null>(null)
+  const [completedTrainingIds, setCompletedTrainingIds] = useState<Record<string, boolean>>({})
   const [recoverEmail, setRecoverEmail] = useState('aluno@forma.com')
   const [studentRegistrations, setStudentRegistrations] = useState<StudentRegistration[]>([])
   const [selectedStudent, setSelectedStudent] = useState<StudentRegistration | null>(null)
 
   const updateProfile = (changes: Partial<UserProfile>) => {
     setProfile((prev) => ({ ...prev, ...changes }))
+  }
+
+  const handleTrainingCheckIn = (trainingId: string) => {
+    setCompletedTrainingIds((prev) => {
+      if (prev[trainingId]) {
+        return prev
+      }
+      return { ...prev, [trainingId]: true }
+    })
   }
 
   const screen = useMemo(() => {
@@ -148,6 +160,7 @@ function App() {
         return (
           <StudentScreen
             profile={profile}
+            completedTrainingIds={completedTrainingIds}
             onBackHome={() => setActiveScreen('landing')}
             onOpenProfile={() => setActiveScreen('profile')}
             onViewTraining={(training) => {
@@ -163,8 +176,11 @@ function App() {
             onBack={() => setActiveScreen('student')}
             onUpdateProfile={updateProfile}
             onNavigateToData={() => setActiveScreen('profileData')}
+            onOpenFinance={() => setActiveScreen('studentFinance')}
           />
         )
+      case 'studentFinance':
+        return <StudentFinanceScreen onBack={() => setActiveScreen('profile')} />
       // case 'profileData':
       //   return (
       //     <ProfileDataScreen
@@ -183,10 +199,13 @@ function App() {
             profile={profile}
             onBack={() => setActiveScreen('student')}
             onOpenProfile={() => setActiveScreen('profile')}
+            onCheckIn={handleTrainingCheckIn}
+            isCompleted={Boolean(completedTrainingIds[selectedTraining.id])}
           />
         ) : (
           <StudentScreen
             profile={profile}
+            completedTrainingIds={completedTrainingIds}
             onBackHome={() => setActiveScreen('landing')}
             onOpenProfile={() => setActiveScreen('profile')}
             onViewTraining={(training) => {
@@ -206,7 +225,15 @@ function App() {
       default:
         return null
     }
-  }, [activeScreen, profile, selectedTraining, recoverEmail, studentRegistrations, selectedStudent])
+  }, [
+    activeScreen,
+    profile,
+    selectedTraining,
+    recoverEmail,
+    studentRegistrations,
+    selectedStudent,
+    completedTrainingIds,
+  ])
 
   return (
     <SafeAreaView style={styles.root}>

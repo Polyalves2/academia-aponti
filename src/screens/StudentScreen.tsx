@@ -1,18 +1,27 @@
 import { useMemo } from 'react'
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Image, ImageSourcePropType, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { BrandWordmark } from '../components/BrandWordmark'
 import { trainings, Training } from '../data/trainings'
 import { UserProfile } from '../types/profile'
 import backIcon from '../assets/icon_seta.png'
+import trophyIcon from '../assets/trofeu.png'
+import gastoCaloricoIcon from '../assets/Gasto Calorico.png'
 
 interface StudentScreenProps {
   profile: UserProfile
+  completedTrainingIds: Record<string, boolean>
   onBackHome: () => void
   onOpenProfile: () => void
   onViewTraining: (training: Training) => void
 }
 
-export function StudentScreen({ onBackHome, onOpenProfile, onViewTraining, profile }: StudentScreenProps) {
+export function StudentScreen({
+  onBackHome,
+  onOpenProfile,
+  onViewTraining,
+  profile,
+  completedTrainingIds,
+}: StudentScreenProps) {
   const recommendedTraining = trainings[0]
   const otherTrainings = useMemo(() => trainings.slice(1), [])
   const hasPhoto = Boolean(profile.photoUri)
@@ -43,12 +52,18 @@ export function StudentScreen({ onBackHome, onOpenProfile, onViewTraining, profi
         <Text style={styles.sectionTitle}>Treino indicado:</Text>
         <TrainingCard
           training={recommendedTraining}
+          isCompleted={Boolean(completedTrainingIds[recommendedTraining.id])}
           highlight
           onViewDetails={onViewTraining}
         />
 
         {otherTrainings.map((training) => (
-          <TrainingCard key={training.id} training={training} onViewDetails={onViewTraining} />
+          <TrainingCard
+            key={training.id}
+            training={training}
+            isCompleted={Boolean(completedTrainingIds[training.id])}
+            onViewDetails={onViewTraining}
+          />
         ))}
       </ScrollView>
     </View>
@@ -58,22 +73,34 @@ export function StudentScreen({ onBackHome, onOpenProfile, onViewTraining, profi
 interface TrainingCardProps {
   training: Training
   highlight?: boolean
+  isCompleted?: boolean
   onViewDetails: (training: Training) => void
 }
 
-function TrainingCard({ training, highlight, onViewDetails }: TrainingCardProps) {
+function TrainingCard({ training, highlight, isCompleted, onViewDetails }: TrainingCardProps) {
   return (
     <View style={[styles.card, highlight && styles.cardHighlight]}>
       <View style={styles.cardHeader}>
-        <View style={styles.cardIcon} />
+        <Image source={trophyIcon} style={styles.cardIcon} />
         <View style={styles.cardHeaderCopy}>
-          <Text style={styles.cardTitle}>{training.titulo}</Text>
+          <View style={styles.cardTitleRow}>
+            <Text style={styles.cardTitle}>{training.titulo}</Text>
+            {isCompleted ? (
+              <View style={styles.completedBadge}>
+                <Text style={styles.completedBadgeText}>Concluido</Text>
+              </View>
+            ) : null}
+          </View>
           <Text style={styles.cardFocus}>{training.foco}</Text>
         </View>
       </View>
 
       <View style={styles.cardInfo}>
-        <InfoLine label="Gasto calorico" value={`${training.calorias.min}-${training.calorias.max} kcal`} />
+        <InfoLine
+          label="Gasto calorico"
+          value={`${training.calorias.min}-${training.calorias.max} kcal`}
+          iconSource={gastoCaloricoIcon}
+        />
         <InfoLine label="Objetivo" value={training.objetivo} />
         <InfoLine label="Tempo medio" value={`${training.tempo.min} a ${training.tempo.max} minutos`} />
         <InfoLine label="Frequencia" value={`${training.frequenciaSemanal}x por semana`} />
@@ -89,12 +116,13 @@ function TrainingCard({ training, highlight, onViewDetails }: TrainingCardProps)
 interface InfoLineProps {
   label: string
   value: string
+  iconSource?: ImageSourcePropType
 }
 
-function InfoLine({ label, value }: InfoLineProps) {
+function InfoLine({ label, value, iconSource }: InfoLineProps) {
   return (
     <View style={styles.infoLine}>
-      <View style={styles.infoBullet} />
+      {iconSource ? <Image source={iconSource} style={styles.infoIcon} /> : <View style={styles.infoBullet} />}
       <View style={styles.infoTextWrapper}>
         <Text style={styles.infoLabel}>{label}:</Text>
         <Text style={styles.infoValue}>{value}</Text>
@@ -199,17 +227,33 @@ const styles = StyleSheet.create({
   cardIcon: {
     width: 36,
     height: 36,
-    borderRadius: 18,
-    backgroundColor: '#ffe398',
     marginRight: 12,
+    resizeMode: 'contain',
   },
   cardHeaderCopy: {
     flex: 1,
+  },
+  cardTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flexWrap: 'wrap',
   },
   cardTitle: {
     fontWeight: '800',
     fontSize: 18,
     color: '#1b1f2c',
+  },
+  completedBadge: {
+    backgroundColor: '#e1f3e7',
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+  completedBadgeText: {
+    color: '#1c6b3d',
+    fontWeight: '800',
+    fontSize: 11,
   },
   cardFocus: {
     color: '#4b5463',
@@ -222,7 +266,7 @@ const styles = StyleSheet.create({
   },
   infoLine: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
   },
   infoBullet: {
     width: 8,
@@ -231,6 +275,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#4a6ef4',
     marginTop: 6,
     marginRight: 10,
+  },
+  infoIcon: {
+    width: 16,
+    height: 16,
+    marginTop: 2,
+    marginRight: 10,
+    resizeMode: 'contain',
   },
   infoTextWrapper: {
     flex: 1,

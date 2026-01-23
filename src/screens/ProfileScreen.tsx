@@ -9,9 +9,10 @@ interface ProfileScreenProps {
   onBack: () => void
   onUpdateProfile: (changes: Partial<UserProfile>) => void
   onNavigateToData: () => void
+  onOpenFinance: () => void
 }
 
-export function ProfileScreen({ profile, onBack, onUpdateProfile }: ProfileScreenProps) {
+export function ProfileScreen({ profile, onBack, onUpdateProfile, onOpenFinance }: ProfileScreenProps) {
   const pickImage = useCallback(
     async (source: 'camera' | 'library') => {
       try {
@@ -66,9 +67,7 @@ export function ProfileScreen({ profile, onBack, onUpdateProfile }: ProfileScree
   }
 
   const actionButtons = [
-    { label: 'Financeiro', onPress: () => Alert.alert('Financeiro', 'Funcionalidade em breve.') },
-    { label: 'Check-in', onPress: () => Alert.alert('Check-in', 'Funcionalidade em breve.') },
-    { label: 'Baixar avaliacao', onPress: () => Alert.alert('Baixar avaliacao', 'Funcionalidade em breve.') },
+    { label: 'Financeiro', onPress: onOpenFinance },
   ]
 
   return (
@@ -226,17 +225,14 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   buttonGroup: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    gap: 12,
   },
   actionButton: {
-    width: '48%',
+    width: '100%',
     backgroundColor: '#1f4fc6',
     paddingVertical: 14,
     borderRadius: 16,
     alignItems: 'center',
-    marginBottom: 12,
     shadowColor: '#000',
     shadowOpacity: 0.15,
     shadowRadius: 10,

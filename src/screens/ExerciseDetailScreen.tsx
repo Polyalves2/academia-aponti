@@ -1,4 +1,4 @@
-import { Image, ImageSourcePropType, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, Image, ImageSourcePropType, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Training } from '../data/trainings'
 import { UserProfile } from '../types/profile'
 import backIcon from '../assets/icon_seta.png'
@@ -8,6 +8,8 @@ interface ExerciseDetailScreenProps {
   profile: UserProfile
   onBack: () => void
   onOpenProfile?: () => void
+  onCheckIn?: (trainingId: string) => void
+  isCompleted?: boolean
 }
 
 const trainingImageAssets: Record<string, ImageSourcePropType | undefined> = {
@@ -15,9 +17,29 @@ const trainingImageAssets: Record<string, ImageSourcePropType | undefined> = {
   peito_triceps: require('../assets/peito_triceps.png'),
 }
 
-export function ExerciseDetailScreen({ training, profile, onBack, onOpenProfile }: ExerciseDetailScreenProps) {
+export function ExerciseDetailScreen({
+  training,
+  profile,
+  onBack,
+  onOpenProfile,
+  onCheckIn,
+  isCompleted,
+}: ExerciseDetailScreenProps) {
   const imageSource = getTrainingImage(training.imageKeywords)
   const hasPhoto = Boolean(profile.photoUri)
+  const handleCheckIn = () => {
+    if (isCompleted) {
+      return
+    }
+    const message = 'Check-in realizado'
+    if (Platform.OS === 'web') {
+      globalThis.alert?.(message)
+      onCheckIn?.(training.id)
+      return
+    }
+    onCheckIn?.(training.id)
+    Alert.alert(message)
+  }
 
   return (
     <View style={styles.screen}>
@@ -73,6 +95,14 @@ export function ExerciseDetailScreen({ training, profile, onBack, onOpenProfile 
             <Text style={styles.exerciseArrow}>{'>'}</Text>
           </View>
         ))}
+
+        <TouchableOpacity
+          style={[styles.checkInButton, isCompleted && styles.checkInButtonDisabled]}
+          onPress={handleCheckIn}
+          disabled={Boolean(isCompleted)}
+        >
+          <Text style={styles.checkInButtonText}>Check-in</Text>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   )
@@ -250,5 +280,24 @@ const styles = StyleSheet.create({
     color: '#9aa4bd',
     fontSize: 16,
     fontWeight: '800',
+  },
+  checkInButton: {
+    backgroundColor: '#1f4fc6',
+    paddingVertical: 14,
+    borderRadius: 16,
+    alignItems: 'center',
+    marginTop: 6,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+  },
+  checkInButtonText: {
+    color: '#ffffff',
+    fontWeight: '800',
+  },
+  checkInButtonDisabled: {
+    opacity: 0.55,
   },
 })
