@@ -2,6 +2,7 @@ import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View 
 import { useMemo, useState } from 'react'
 import backIcon from '../assets/icon_seta.png'
 import studentPhoto from '../assets/aluno_homem.jpg'
+import professorFemalePhoto from '../assets/aluna_mulher.png'
 
 interface AdminProfessorListScreenProps {
   onBack: () => void
@@ -66,16 +67,18 @@ export function AdminProfessorListScreen({ onBack, onSelect }: AdminProfessorLis
               }}
             >
             {professor.genero === 'Feminino' ? (
-              <View style={styles.avatarFemale}>
-                <Text style={styles.avatarInitial}>{professor.nome.slice(0, 1).toUpperCase()}</Text>
+              <View style={styles.avatarFrame}>
+                <Image source={professorFemalePhoto} style={styles.avatarFemaleImage} />
               </View>
             ) : (
-              <Image source={studentPhoto} style={styles.avatar} />
+              <View style={styles.avatarFrame}>
+                <Image source={studentPhoto} style={styles.avatar} />
+              </View>
             )}
             <View style={styles.itemInfo}>
               <Text style={styles.itemName}>{professor.nome}</Text>
             </View>
-            {isEllen ? <Text style={styles.itemArrow}>{'>'}</Text> : null}
+            <Text style={styles.itemArrow}>{'>'}</Text>
             </TouchableOpacity>
           )
         })}
@@ -186,23 +189,23 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 6 },
   },
   avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    marginRight: 12,
+    width: '100%',
+    height: '140%',
+    transform: [{ translateY: 12 }],
   },
-  avatarFemale: {
+  avatarFrame: {
     width: 48,
     height: 48,
     borderRadius: 24,
     marginRight: 12,
-    backgroundColor: '#f3d9e8',
+    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarInitial: {
-    color: '#7a2d57',
-    fontWeight: '800',
+  avatarFemaleImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
   },
   itemInfo: {
     flex: 1,

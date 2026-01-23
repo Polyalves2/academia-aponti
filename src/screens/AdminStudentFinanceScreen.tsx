@@ -239,11 +239,17 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: -6,
     marginBottom: 10,
-  },
-  photo: {
     width: 90,
     height: 90,
     borderRadius: 45,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  photo: {
+    width: '100%',
+    height: '140%',
+    transform: [{ translateY: 24 }],
   },
   closeBadge: {
     position: 'absolute',

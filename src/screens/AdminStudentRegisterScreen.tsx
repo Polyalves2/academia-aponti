@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Alert, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Alert, Image, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import backIcon from '../assets/icon_seta.png'
 import { StudentRegistration } from '../types/admin'
 
@@ -55,7 +55,18 @@ export function AdminStudentRegisterScreen({ onBack, onSubmit }: AdminStudentReg
     }
 
     onSubmit(registration)
-    Alert.alert('Dados cadastrados', 'c.')
+    const message = 'Aluno cadastrado'
+    if (Platform.OS === 'web') {
+      globalThis.alert?.(message)
+      onBack()
+      return
+    }
+    Alert.alert(message, '', [
+      {
+        text: 'OK',
+        onPress: onBack,
+      },
+    ])
   }
 
   return (

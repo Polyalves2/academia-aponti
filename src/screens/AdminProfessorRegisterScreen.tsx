@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
-import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { useState } from 'react'
+import { Alert, Image, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import backIcon from '../assets/icon_seta.png'
 
 interface AdminProfessorRegisterScreenProps {
@@ -22,25 +22,19 @@ export function AdminProfessorRegisterScreen({ onBack }: AdminProfessorRegisterS
   const [numero, setNumero] = useState('')
   const [maisInformacoes, setMaisInformacoes] = useState('')
   const [instituicao, setInstituicao] = useState('')
-  const [feedback, setFeedback] = useState('')
-  const returnTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  useEffect(() => {
-    return () => {
-      if (returnTimeoutRef.current) {
-        clearTimeout(returnTimeoutRef.current)
-      }
-    }
-  }, [])
-
   const handleSubmit = () => {
-    setFeedback('Professor cadastrado com sucesso.')
-    if (returnTimeoutRef.current) {
-      clearTimeout(returnTimeoutRef.current)
-    }
-    returnTimeoutRef.current = setTimeout(() => {
+    const message = 'Professor cadastrado'
+    if (Platform.OS === 'web') {
+      globalThis.alert?.(message)
       onBack()
-    }, 700)
+      return
+    }
+    Alert.alert(message, '', [
+      {
+        text: 'OK',
+        onPress: onBack,
+      },
+    ])
   }
 
   return (
@@ -94,7 +88,6 @@ export function AdminProfessorRegisterScreen({ onBack }: AdminProfessorRegisterS
             <Text style={styles.primaryButtonText}>Cadastrar dados</Text>
           </TouchableOpacity>
 
-          {feedback ? <Text style={styles.feedback}>{feedback}</Text> : null}
         </View>
       </ScrollView>
     </View>
@@ -216,11 +209,5 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     color: '#ffffff',
     fontWeight: '800',
-  },
-  feedback: {
-    color: '#1e3160',
-    fontWeight: '700',
-    textAlign: 'center',
-    marginTop: 10,
   },
 })

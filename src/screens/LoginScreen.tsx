@@ -68,7 +68,6 @@ export function LoginScreen({ onBackHome, onLoginSuccess, onForgotPassword }: Lo
   }
 
   const handleLogin = () => {
-    setFeedback(`Acesso liberado para o perfil ${selectedRole}.`)
     setTimeout(() => onLoginSuccess(selectedRole), 500)
   }
 

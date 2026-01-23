@@ -13,7 +13,6 @@ import { AdminProfessorProfileScreen } from './screens/AdminProfessorProfileScre
 import { RecoverPasswordScreen } from './screens/RecoverPasswordScreen'
 import { StudentScreen } from './screens/StudentScreen'
 import { ProfileScreen } from './screens/ProfileScreen'
-// import { ProfileDataScreen } from './screens/ProfileDataScreen'
 import { ExerciseDetailScreen } from './screens/ExerciseDetailScreen'
 import { StudentFinanceScreen } from './screens/StudentFinanceScreen'
 import { UserProfile } from './types/profile'
@@ -181,17 +180,6 @@ function App() {
         )
       case 'studentFinance':
         return <StudentFinanceScreen onBack={() => setActiveScreen('profile')} />
-      // case 'profileData':
-      //   return (
-      //     <ProfileDataScreen
-      //       profile={profile}
-      //       onBack={() => setActiveScreen('profile')}
-      //       onSave={(data) => {
-      //         updateProfile(data)
-      //         setActiveScreen('profile')
-      //       }}
-      //     />
-      //   )
       case 'trainingDetail':
         return selectedTraining ? (
           <ExerciseDetailScreen

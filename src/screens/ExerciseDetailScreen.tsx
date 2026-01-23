@@ -15,6 +15,12 @@ interface ExerciseDetailScreenProps {
 const trainingImageAssets: Record<string, ImageSourcePropType | undefined> = {
   pernas_gluteos: require('../assets/pernas_gluteos.png'),
   peito_triceps: require('../assets/peito_triceps.png'),
+  treino_a: require('../assets/Imagem treino a.png'),
+  treino_b: require('../assets/imagem treino b.png'),
+  treino_c: require('../assets/imagem treino C.png'),
+  treino_d: require('../assets/imagem treino d .png'),
+  treino_e: require('../assets/imagem treino e.png'),
+  treino_f: require('../assets/imagem treino f.png'),
 }
 
 export function ExerciseDetailScreen({
@@ -25,7 +31,7 @@ export function ExerciseDetailScreen({
   onCheckIn,
   isCompleted,
 }: ExerciseDetailScreenProps) {
-  const imageSource = getTrainingImage(training.imageKeywords)
+  const imageSource = trainingImageAssets[training.id] ?? getTrainingImage(training.imageKeywords)
   const hasPhoto = Boolean(profile.photoUri)
   const handleCheckIn = () => {
     if (isCompleted) {
@@ -73,7 +79,7 @@ export function ExerciseDetailScreen({
 
           <View style={styles.imageFrame}>
             {imageSource ? (
-              <Image source={imageSource} style={styles.trainingImage} resizeMode="cover" />
+              <Image source={imageSource} style={styles.trainingImage} resizeMode="contain" />
             ) : (
               <View style={styles.imagePlaceholder} />
             )}
@@ -219,20 +225,22 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   imageFrame: {
-    borderRadius: 18,
-    borderWidth: 2,
-    borderColor: '#173c9b',
-    padding: 4,
-    height: 200,
-    aspectRatio: 3 / 4,
+    borderRadius: 20,
+    borderWidth: 0,
+    backgroundColor: 'transparent',
+    padding: 0,
     justifyContent: 'center',
     alignItems: 'center',
     alignSelf: 'center',
   },
   trainingImage: {
-    width: '100%',
-    height: '100%',
+    width: 280,
+    height: 180,
     borderRadius: 14,
+    borderWidth: 3,
+    borderColor: '#2f57b0',
+    backgroundColor: '#2f57b0',
+    alignSelf: 'center',
   },
   imagePlaceholder: {
     flex: 1,

@@ -1,6 +1,6 @@
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import backIcon from '../assets/icon_seta.png'
-import femalePhoto from '../assets/aluno_homem.jpg'
+import femalePhoto from '../assets/aluna_mulher.png'
 
 interface AdminProfessorProfileScreenProps {
   onBack: () => void
@@ -118,11 +118,17 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: -6,
     marginBottom: 10,
-  },
-  photo: {
     width: 120,
     height: 120,
     borderRadius: 12,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  photo: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
   },
   row: {
     flexDirection: 'row',

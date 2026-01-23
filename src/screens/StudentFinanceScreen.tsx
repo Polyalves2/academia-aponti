@@ -45,7 +45,9 @@ export function StudentFinanceScreen({ onBack }: StudentFinanceScreenProps) {
 
       <ScrollView contentContainerStyle={styles.content} bounces keyboardShouldPersistTaps="handled">
         <View style={styles.profileCard}>
-          <Image source={studentPhoto} style={styles.profilePhoto} />
+          <View style={styles.profilePhotoFrame}>
+            <Image source={studentPhoto} style={styles.profilePhoto} />
+          </View>
           <View style={styles.statusBadge}>
             <Text style={styles.profileStatus}>Status: Ativo</Text>
           </View>
@@ -202,10 +204,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
   },
-  profilePhoto: {
+  profilePhotoFrame: {
     width: 90,
     height: 90,
     borderRadius: 18,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  profilePhoto: {
+    width: '100%',
+    height: '130%',
+    transform: [{ translateY: 14 }],
   },
   profileStatus: {
     color: '#1e3160',
