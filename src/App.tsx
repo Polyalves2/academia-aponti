@@ -2,14 +2,39 @@ import { useMemo, useState } from 'react'
 import { SafeAreaView, StatusBar, StyleSheet, View } from 'react-native'
 import { LandingScreen } from './screens/LandingScreen'
 import { LoginScreen } from './screens/LoginScreen'
+import { AdminScreen } from './screens/AdminScreen'
+import { AdminStudentRegisterScreen } from './screens/AdminStudentRegisterScreen'
+import { AdminStudentFinanceScreen } from './screens/AdminStudentFinanceScreen'
+import { AdminStudentListScreen } from './screens/AdminStudentListScreen'
+import { AdminStudentFrequencyScreen } from './screens/AdminStudentFrequencyScreen'
+import { AdminProfessorRegisterScreen } from './screens/AdminProfessorRegisterScreen'
+import { AdminProfessorListScreen } from './screens/AdminProfessorListScreen'
+import { AdminProfessorProfileScreen } from './screens/AdminProfessorProfileScreen'
+import { RecoverPasswordScreen } from './screens/RecoverPasswordScreen'
 import { StudentScreen } from './screens/StudentScreen'
 import { ProfileScreen } from './screens/ProfileScreen'
-import { ProfileDataScreen } from './screens/ProfileDataScreen'
+// import { ProfileDataScreen } from './screens/ProfileDataScreen'
 import { ExerciseDetailScreen } from './screens/ExerciseDetailScreen'
 import { UserProfile } from './types/profile'
 import { Training } from './data/trainings'
+import { StudentRegistration } from './types/admin'
 
-type AppScreen = 'landing' | 'login' | 'student' | 'profile' | 'profileData' | 'trainingDetail'
+type AppScreen =
+  | 'landing'
+  | 'login'
+  | 'student'
+  | 'admin'
+  | 'adminStudentRegister'
+  | 'adminProfessorRegister'
+  | 'adminStudentList'
+  | 'adminStudentFrequency'
+  | 'adminStudentFinance'
+  | 'adminProfessorList'
+  | 'adminProfessorProfile'
+  | 'profile'
+  | 'profileData'
+  | 'trainingDetail'
+  | 'recoverPassword'
 
 function App() {
   const [activeScreen, setActiveScreen] = useState<AppScreen>('landing')
@@ -25,6 +50,9 @@ function App() {
     photoUri: undefined,
   })
   const [selectedTraining, setSelectedTraining] = useState<Training | null>(null)
+  const [recoverEmail, setRecoverEmail] = useState('aluno@forma.com')
+  const [studentRegistrations, setStudentRegistrations] = useState<StudentRegistration[]>([])
+  const [selectedStudent, setSelectedStudent] = useState<StudentRegistration | null>(null)
 
   const updateProfile = (changes: Partial<UserProfile>) => {
     setProfile((prev) => ({ ...prev, ...changes }))
@@ -38,7 +66,82 @@ function App() {
         return (
           <LoginScreen
             onBackHome={() => setActiveScreen('landing')}
-            onLoginSuccess={() => setActiveScreen('student')}
+            onLoginSuccess={(role) =>
+              setActiveScreen(role === 'Administrador' ? 'admin' : 'student')
+            }
+            onForgotPassword={(email) => {
+              setRecoverEmail(email)
+              setActiveScreen('recoverPassword')
+            }}
+          />
+        )
+      case 'admin':
+        return (
+          <AdminScreen
+            onBackHome={() => setActiveScreen('landing')}
+            onRegisterStudent={() => setActiveScreen('adminStudentRegister')}
+            onRegisterProfessor={() => setActiveScreen('adminProfessorRegister')}
+            onOpenTotal={() => setActiveScreen('adminStudentList')}
+            onOpenFrequency={() => setActiveScreen('adminStudentFrequency')}
+            onOpenProfessorTotal={() => setActiveScreen('adminProfessorList')}
+          />
+        )
+      case 'adminStudentRegister':
+        return (
+          <AdminStudentRegisterScreen
+            onBack={() => setActiveScreen('admin')}
+            onSubmit={(registration) => {
+              setStudentRegistrations((prev) => [registration, ...prev])
+            }}
+          />
+        )
+      case 'adminProfessorRegister':
+        return <AdminProfessorRegisterScreen onBack={() => setActiveScreen('admin')} />
+      case 'adminProfessorList':
+        return (
+          <AdminProfessorListScreen
+            onBack={() => setActiveScreen('admin')}
+            onSelect={() => setActiveScreen('adminProfessorProfile')}
+          />
+        )
+      case 'adminProfessorProfile':
+        return <AdminProfessorProfileScreen onBack={() => setActiveScreen('adminProfessorList')} />
+      case 'adminStudentList':
+        return (
+          <AdminStudentListScreen
+            registrations={studentRegistrations}
+            onBack={() => setActiveScreen('admin')}
+            onSelect={(registration) => {
+              setSelectedStudent(registration)
+              setActiveScreen('adminStudentFinance')
+            }}
+          />
+        )
+      case 'adminStudentFrequency':
+        return (
+          <AdminStudentFrequencyScreen
+            registrations={studentRegistrations}
+            onBack={() => setActiveScreen('admin')}
+            onSelect={(registration) => {
+              setSelectedStudent(registration)
+              setActiveScreen('adminStudentFinance')
+            }}
+          />
+        )
+      case 'adminStudentFinance':
+        return selectedStudent ? (
+          <AdminStudentFinanceScreen
+            registration={selectedStudent}
+            onBack={() => setActiveScreen('adminStudentList')}
+          />
+        ) : (
+          <AdminStudentListScreen
+            registrations={studentRegistrations}
+            onBack={() => setActiveScreen('adminStudentConsultMenu')}
+            onSelect={(registration) => {
+              setSelectedStudent(registration)
+              setActiveScreen('adminStudentFinance')
+            }}
           />
         )
       case 'student':
@@ -62,17 +165,17 @@ function App() {
             onNavigateToData={() => setActiveScreen('profileData')}
           />
         )
-      case 'profileData':
-        return (
-          <ProfileDataScreen
-            profile={profile}
-            onBack={() => setActiveScreen('profile')}
-            onSave={(data) => {
-              updateProfile(data)
-              setActiveScreen('profile')
-            }}
-          />
-        )
+      // case 'profileData':
+      //   return (
+      //     <ProfileDataScreen
+      //       profile={profile}
+      //       onBack={() => setActiveScreen('profile')}
+      //       onSave={(data) => {
+      //         updateProfile(data)
+      //         setActiveScreen('profile')
+      //       }}
+      //     />
+      //   )
       case 'trainingDetail':
         return selectedTraining ? (
           <ExerciseDetailScreen
@@ -92,10 +195,18 @@ function App() {
             }}
           />
         )
+      case 'recoverPassword':
+        return (
+          <RecoverPasswordScreen
+            email={recoverEmail}
+            onBack={() => setActiveScreen('login')}
+            onComplete={() => setActiveScreen('login')}
+          />
+        )
       default:
         return null
     }
-  }, [activeScreen, profile, selectedTraining])
+  }, [activeScreen, profile, selectedTraining, recoverEmail, studentRegistrations, selectedStudent])
 
   return (
     <SafeAreaView style={styles.root}>

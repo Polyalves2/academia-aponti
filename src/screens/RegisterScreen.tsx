@@ -35,7 +35,7 @@ export function RegisterScreen({ onNavigateToLogin, onBackHome, onRegisterSucces
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={styles.container} bounces keyboardShouldPersistTaps="handled">
       <TouchableOpacity onPress={onBackHome} activeOpacity={0.8}>
         <BrandWordmark size="lg" />
       </TouchableOpacity>

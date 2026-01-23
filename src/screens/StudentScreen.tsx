@@ -3,6 +3,7 @@ import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'rea
 import { BrandWordmark } from '../components/BrandWordmark'
 import { trainings, Training } from '../data/trainings'
 import { UserProfile } from '../types/profile'
+import backIcon from '../assets/icon_seta.png'
 
 interface StudentScreenProps {
   profile: UserProfile
@@ -19,9 +20,14 @@ export function StudentScreen({ onBackHome, onOpenProfile, onViewTraining, profi
   return (
     <View style={styles.screen}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={onBackHome}>
-          <BrandWordmark size="lg" />
-        </TouchableOpacity>
+        <View style={styles.headerLeft}>
+          <TouchableOpacity onPress={onBackHome} style={styles.backButton}>
+            <Image source={backIcon} style={styles.backIcon} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={onBackHome}>
+            <BrandWordmark size="lg" />
+          </TouchableOpacity>
+        </View>
         <TouchableOpacity style={styles.avatarWrapper} onPress={onOpenProfile}>
           {hasPhoto ? (
             <Image source={{ uri: profile.photoUri }} style={styles.avatar} />
@@ -33,7 +39,7 @@ export function StudentScreen({ onBackHome, onOpenProfile, onViewTraining, profi
         </TouchableOpacity>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scroll}>
+      <ScrollView contentContainerStyle={styles.scroll} bounces keyboardShouldPersistTaps="handled">
         <Text style={styles.sectionTitle}>Treino indicado:</Text>
         <TrainingCard
           training={recommendedTraining}
@@ -111,6 +117,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingBottom: 12,
     backgroundColor: '#083060',
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  backButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#083272',
+    borderWidth: 1,
+    borderColor: '#1a4a9a',
+  },
+  backIcon: {
+    width: 16,
+    height: 16,
+    tintColor: '#000000',
+    transform: [{ rotate: '180deg' }],
   },
   avatarWrapper: {
     width: 46,

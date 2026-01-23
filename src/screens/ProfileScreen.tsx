@@ -2,6 +2,7 @@ import { useCallback } from 'react'
 import { Alert, Image, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
 import { UserProfile } from '../types/profile'
+import backIcon from '../assets/icon_seta.png'
 
 interface ProfileScreenProps {
   profile: UserProfile
@@ -77,13 +78,13 @@ export function ProfileScreen({ profile, onBack, onUpdateProfile, onNavigateToDa
     <View style={styles.screen}>
       <View style={styles.header}>
         <TouchableOpacity onPress={onBack} style={styles.backButton}>
-          <Text style={styles.backButtonText}>{'<'}</Text>
+          <Image source={backIcon} style={styles.backIcon} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Perfil</Text>
         <View style={{ width: 32 }} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.content} bounces={false}>
+      <ScrollView contentContainerStyle={styles.content} bounces keyboardShouldPersistTaps="handled">
         <View style={styles.card}>
           <TouchableOpacity style={styles.photoBox} onPress={handlePhotoPress} activeOpacity={0.8}>
             {profile.photoUri ? (
@@ -146,12 +147,20 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   backButton: {
-    padding: 10,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#083272',
+    borderWidth: 1,
+    borderColor: '#1a4a9a',
   },
-  backButtonText: {
-    color: '#ffffff',
-    fontSize: 22,
-    fontWeight: '800',
+  backIcon: {
+    width: 18,
+    height: 18,
+    tintColor: '#000000',
+    transform: [{ rotate: '180deg' }],
   },
   headerTitle: {
     color: '#ffffff',

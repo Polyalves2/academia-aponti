@@ -16,13 +16,19 @@ type Role = 'Aluno' | 'Professor' | 'Administrador'
 
 interface LoginScreenProps {
   onBackHome: () => void
-  onLoginSuccess: () => void
+  onLoginSuccess: (role: Role) => void
+  onForgotPassword: (email: string) => void
 }
 
 const roleCredentials: Record<Role, { label: string; idValue: string; password: string }> = {
   Aluno: { label: 'Matricula', idValue: '857083', password: 'forma@demo' },
   Professor: { label: 'Matricula', idValue: 'PRF-1188', password: 'forma@demo' },
   Administrador: { label: 'Codigo', idValue: 'ADM-0001', password: 'forma@demo' },
+}
+const roleEmails: Record<Role, string> = {
+  Aluno: 'aluno@forma.com',
+  Professor: 'professor@forma.com',
+  Administrador: 'administrador@forma.com',
 }
 
 const roles: Role[] = ['Aluno', 'Professor', 'Administrador']
@@ -47,7 +53,7 @@ function useTailwindCdn() {
   }, [])
 }
 
-export function LoginScreen({ onBackHome, onLoginSuccess }: LoginScreenProps) {
+export function LoginScreen({ onBackHome, onLoginSuccess, onForgotPassword }: LoginScreenProps) {
   useTailwindCdn()
   const [selectedRole, setSelectedRole] = useState<Role>('Aluno')
   const [isPickerOpen, setIsPickerOpen] = useState(false)
@@ -63,14 +69,14 @@ export function LoginScreen({ onBackHome, onLoginSuccess }: LoginScreenProps) {
 
   const handleLogin = () => {
     setFeedback(`Acesso liberado para o perfil ${selectedRole}.`)
-    setTimeout(onLoginSuccess, 500)
+    setTimeout(() => onLoginSuccess(selectedRole), 500)
   }
 
   const credentials = roleCredentials[selectedRole]
 
   const content = (
     <View style={styles.screen}>
-      <ScrollView contentContainerStyle={styles.container} bounces={false}>
+      <ScrollView contentContainerStyle={styles.container} bounces keyboardShouldPersistTaps="handled">
         <TouchableOpacity onPress={onBackHome} activeOpacity={0.8}>
           <BrandWordmark size="lg" />
         </TouchableOpacity>
@@ -89,20 +95,22 @@ export function LoginScreen({ onBackHome, onLoginSuccess }: LoginScreenProps) {
 
               {isPickerOpen && (
                 <View style={styles.dropdownList}>
-                  {roles.map((role) => {
-                    const active = role === selectedRole
-                    return (
-                      <TouchableOpacity
-                        key={role}
-                        style={[styles.dropdownOption, active && styles.dropdownOptionActive]}
-                        onPress={() => handleSelectRole(role)}
-                      >
-                        <Text style={[styles.dropdownOptionText, active && styles.dropdownOptionTextActive]}>
-                          {role}
-                        </Text>
-                      </TouchableOpacity>
-                    )
-                  })}
+                  <ScrollView style={styles.dropdownScroll} nestedScrollEnabled showsVerticalScrollIndicator>
+                    {roles.map((role) => {
+                      const active = role === selectedRole
+                      return (
+                        <TouchableOpacity
+                          key={role}
+                          style={[styles.dropdownOption, active && styles.dropdownOptionActive]}
+                          onPress={() => handleSelectRole(role)}
+                        >
+                          <Text style={[styles.dropdownOptionText, active && styles.dropdownOptionTextActive]}>
+                            {role}
+                          </Text>
+                        </TouchableOpacity>
+                      )
+                    })}
+                  </ScrollView>
                 </View>
               )}
             </View>
@@ -120,7 +128,7 @@ export function LoginScreen({ onBackHome, onLoginSuccess }: LoginScreenProps) {
 
           <View style={styles.recoveryRow}>
             <Text style={styles.recoveryText}>Recuperar senha</Text>
-            <TouchableOpacity onPress={() => {}}>
+            <TouchableOpacity onPress={() => onForgotPassword(roleEmails[selectedRole])}>
               <Text style={styles.recoveryLink}>clique aqui</Text>
             </TouchableOpacity>
           </View>
@@ -245,6 +253,10 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 12 },
     elevation: 12,
     zIndex: 40,
+    maxHeight: 220,
+  },
+  dropdownScroll: {
+    maxHeight: 200,
   },
   dropdownOption: {
     paddingVertical: 12,

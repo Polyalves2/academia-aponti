@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Alert, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { UserProfile } from '../types/profile'
+import backIcon from '../assets/icon_seta.png'
 
 interface ProfileDataScreenProps {
   profile: UserProfile
@@ -22,13 +23,13 @@ export function ProfileDataScreen({ profile, onBack, onSave }: ProfileDataScreen
     <View style={styles.screen}>
       <View style={styles.header}>
         <TouchableOpacity onPress={onBack} style={styles.backButton}>
-          <Text style={styles.backText}>{'<'}</Text>
+          <Image source={backIcon} style={styles.backIcon} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Dados cadastrais</Text>
         <View style={{ width: 32 }} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.content} bounces={false}>
+      <ScrollView contentContainerStyle={styles.content} bounces keyboardShouldPersistTaps="handled">
         <View style={styles.card}>
           <Text style={styles.description}>
             Atualize seus dados de contato. Essas informacoes sao usadas para comunicados importantes.
@@ -83,12 +84,20 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   backButton: {
-    padding: 10,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#083272',
+    borderWidth: 1,
+    borderColor: '#1a4a9a',
   },
-  backText: {
-    color: '#ffffff',
-    fontSize: 22,
-    fontWeight: '800',
+  backIcon: {
+    width: 18,
+    height: 18,
+    tintColor: '#000000',
+    transform: [{ rotate: '180deg' }],
   },
   headerTitle: {
     color: '#ffffff',

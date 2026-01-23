@@ -1,6 +1,7 @@
 import { Image, ImageSourcePropType, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Training } from '../data/trainings'
 import { UserProfile } from '../types/profile'
+import backIcon from '../assets/icon_seta.png'
 
 interface ExerciseDetailScreenProps {
   training: Training
@@ -22,7 +23,7 @@ export function ExerciseDetailScreen({ training, profile, onBack, onOpenProfile 
     <View style={styles.screen}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={onBack}>
-          <Text style={styles.backButtonText}>{'<'}</Text>
+          <Image source={backIcon} style={styles.backIcon} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
           {training.titulo}: {training.foco}
@@ -38,7 +39,7 @@ export function ExerciseDetailScreen({ training, profile, onBack, onOpenProfile 
         </TouchableOpacity>
       </View>
 
-      <ScrollView contentContainerStyle={styles.content} bounces={false}>
+      <ScrollView contentContainerStyle={styles.content} bounces keyboardShouldPersistTaps="handled">
         <View style={styles.card}>
           <View style={styles.areaRow}>
             {training.areas.map((area) => (
@@ -113,12 +114,20 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
   },
   backButton: {
-    padding: 6,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#083272',
+    borderWidth: 1,
+    borderColor: '#1a4a9a',
   },
-  backButtonText: {
-    color: '#ffffff',
-    fontSize: 20,
-    fontWeight: '800',
+  backIcon: {
+    width: 18,
+    height: 18,
+    tintColor: '#000000',
+    transform: [{ rotate: '180deg' }],
   },
   headerTitle: {
     flex: 1,
