@@ -1,3 +1,4 @@
+import React, { useState } from 'react'
 import { Image, ImageSourcePropType, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Training } from '../data/trainings'
 import { UserProfile } from '../types/profile'
@@ -12,11 +13,17 @@ interface ExerciseDetailScreenProps {
 const trainingImageAssets: Record<string, ImageSourcePropType | undefined> = {
   pernas_gluteos: require('../assets/pernas_gluteos.png'),
   peito_triceps: require('../assets/peito_triceps.png'),
+  costas_biceps: require('../assets/costas_biceps.jpeg'),
+  abdomen_core: require('../assets/abdomen_core.jpeg'),
+  ombros_trapezio: require('../assets/ombros_trapezio.jpeg'),
+  fullbody: require('../assets/fullbody.png'),
+  cardio_resistencia: require('../assets/cardio_resistencia.png')
 }
 
 export function ExerciseDetailScreen({ training, profile, onBack, onOpenProfile }: ExerciseDetailScreenProps) {
   const imageSource = getTrainingImage(training.imageKeywords)
   const hasPhoto = Boolean(profile.photoUri)
+  const [concluido, setConcluido] = useState(false)
 
   return (
     <View style={styles.screen}>
@@ -72,6 +79,18 @@ export function ExerciseDetailScreen({ training, profile, onBack, onOpenProfile 
             <Text style={styles.exerciseArrow}>{'>'}</Text>
           </View>
         ))}
+        {concluido ? (
+          <View style={styles.completedContainer}>
+            <Text style={styles.completedText}>✓ CONCLUÍDO</Text>
+          </View>
+        ) : (
+          <TouchableOpacity 
+            style={styles.checkInButton} 
+            onPress={() => setConcluido(true)}
+          >
+            <Text style={styles.checkInText}>CHECK-IN</Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
     </View>
   )
@@ -241,5 +260,31 @@ const styles = StyleSheet.create({
     color: '#9aa4bd',
     fontSize: 16,
     fontWeight: '800',
+  },
+  checkInButton: {
+    backgroundColor: '#173c9b',
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 30,
+  },
+  checkInText: {
+    color: '#ffffff',
+    fontWeight: '800',
+    fontSize: 16,
+  },
+  completedContainer: {
+    backgroundColor: '#2ecc71',
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 30,
+  },
+  completedText: {
+    color: '#ffffff',
+    fontWeight: '800',
+    fontSize: 16,
   },
 })
