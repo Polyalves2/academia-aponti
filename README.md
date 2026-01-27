@@ -35,7 +35,16 @@ Aplicativo mockado da Forma Academia pronto para rodar em um ambiente mobile rea
 - `src/screens/*`: telas mobile (landing, login, cadastro e área do aluno).
 - `src/components/BrandWordmark.tsx`: componente compartilhado da marca.
 
-## Observações
+## Observações 
 
 - Todo o fluxo é mockado — nenhum dado é enviado para APIs reais.
 - Os estilos foram escritos apenas com propriedades suportadas pelo React Native, garantindo compatibilidade ao rodar via Expo/ADB.
+  
+## Versão completa do código na Branch ajustes
+- Instalação no terminal:
+- npm install expo
+- npm run dev 
+
+
+
+
