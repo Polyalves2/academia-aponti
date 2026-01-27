@@ -43,7 +43,7 @@ Aplicativo mockado da Forma Academia pronto para rodar em um ambiente mobile rea
 ## Versão completa do código na Branch ajustes
 - Instalação no terminal:
 - npm install expo
-- npm run dev 
+- npm run web
 
 
 
